@@ -47,7 +47,7 @@ if __name__ == "__main__":
                             'clean'))):
         check_dependencies()
 
-    datafiles = [('data', ['data/facemask.nii.gz','data/mean_reg2mean.nii.gz'])]
+    datafiles = {'pydeface': ['data/facemask.nii.gz','data/mean_reg2mean.nii.gz']}
 
     setup(name=DISTNAME,
         maintainer=MAINTAINER,
@@ -58,7 +58,7 @@ if __name__ == "__main__":
         url=URL,
         download_url=DOWNLOAD_URL,
         packages=['pydeface'],
-        data_files      = datafiles,
+        package_data  = datafiles,
         scripts=['scripts/pydeface.py'],
         classifiers=['Intended Audience :: Science/Research',
                      'Programming Language :: Python :: 2.7',
