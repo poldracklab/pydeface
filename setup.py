@@ -4,28 +4,26 @@
 # some portions borrowed from https://github.com/mwaskom/lyman/blob/master/setup.py
 
 
-descr = """myconnectome: a package to implement analyses for the myconnectome project"""
+descr = """pydeface: a script to remove facial structure from MRI images"""
 
 import os
 from setuptools import setup
+import glob
 
-DISTNAME="myconnectome"
+DISTNAME="pydeface"
 DESCRIPTION=descr
 MAINTAINER='Russ Poldrack'
 MAINTAINER_EMAIL='poldrack@stanford.edu'
 LICENSE='MIT'
-URL='http://myconnectome.org'
-DOWNLOAD_URL='https://github.com/poldrack/myconnectome/'
-VERSION='0.9.0.dev'
+URL='http://poldracklab.org'
+DOWNLOAD_URL='https://github.com/poldracklab/pydeface/'
+VERSION='1.0'
 
 def check_dependencies():
 
     # Just make sure dependencies exist, I haven't rigorously
     # tested what the minimal versions that will work are
-    needed_deps = ["IPython", "numpy", "scipy", "matplotlib",
-                   "sklearn", "statsmodels", "networkx",
-                   "gtf_to_genes","pandas","nilearn",
-		   "nibabel","boto","suds","mygene"]
+    needed_deps = ["numpy", "nibabel","nipype"]
     missing_deps = []
     for dep in needed_deps:
         try:
@@ -34,8 +32,6 @@ def check_dependencies():
             missing_deps.append(dep)
 
     if missing_deps:
-        missing = (", ".join(missing_deps)
-                   .replace("sklearn", "scikit-learn"))
         raise ImportError("Missing dependencies: %s" % missing)
 
 if __name__ == "__main__":
@@ -51,6 +47,8 @@ if __name__ == "__main__":
                             'clean'))):
         check_dependencies()
 
+    datafiles = [('data', ['data/facemask.nii.gz','data/mean_reg2mean.nii.gz'])]
+
     setup(name=DISTNAME,
         maintainer=MAINTAINER,
         maintainer_email=MAINTAINER_EMAIL,
@@ -59,18 +57,10 @@ if __name__ == "__main__":
         version=VERSION,
         url=URL,
         download_url=DOWNLOAD_URL,
-        #install_requires=["moss>=0.3.3"],
-        packages=['myconnectome', 'myconnectome.tests',
-                  'myconnectome.diffusion', 'myconnectome.rsfmri',
-                  'myconnectome.utils', 'myconnectome.taskfmri',
-                  'myconnectome.timeseries','myconnectome.rnaseq',
-                  'myconnectome.metabolomics'],
-#        scripts=['scripts/run_fmri.py', 'scripts/run_group.py',
-#                 'scripts/run_warp.py', 'scripts/setup_project.py',
-#                 'scripts/make_masks.py', 'scripts/anatomy_snapshots.py',
-#                 'scripts/surface_snapshots.py'],
-        classifiers=[
-                     'Intended Audience :: Science/Research',
+        packages=['pydeface'],
+        data_files      = datafiles,
+        scripts=['scripts/pydeface.py'],
+        classifiers=['Intended Audience :: Science/Research',
                      'Programming Language :: Python :: 2.7',
                      'License :: OSI Approved :: BSD License',
                      'Operating System :: POSIX',
