@@ -58,8 +58,8 @@ def main():
     verbose=False
     scriptdir=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) # script directory
 
-    template=resource_filename(Requirement.parse("pydeface"), 'data/mean_reg2mean.nii.gz')
-    facemask=resource_filename(Requirement.parse("pydeface"), "data/facemask.nii.gz")
+    template=resource_filename(Requirement.parse("pydeface"), 'pydeface/data/mean_reg2mean.nii.gz')
+    facemask=resource_filename(Requirement.parse("pydeface"), "pydeface/data/facemask.nii.gz")
 
     try:
         assert os.path.exists(facemask)
