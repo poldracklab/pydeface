@@ -32,7 +32,7 @@ def check_dependencies():
             missing_deps.append(dep)
 
     if missing_deps:
-        raise ImportError("Missing dependencies: %s" % missing)
+        raise ImportError("Missing dependencies: %s" % missing_deps)
 
 if __name__ == "__main__":
 
