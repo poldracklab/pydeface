@@ -5,6 +5,12 @@ Requirements:
 - nibabel
 - nipype
 
-To install:
+####To install:
 
-pip install git+git://github.com/poldracklab/pydeface.git
+* git clone https://github.com/poldracklab/pydeface.git
+* cd pydeface
+* python setup.py install
+
+####To use:
+
+pydeface.py infile.nii.gz
