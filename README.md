@@ -13,4 +13,4 @@ Requirements:
 
 ####To use:
 
-pydeface.py <name of file to deface>
+pydeface.py infile.nii.gz
