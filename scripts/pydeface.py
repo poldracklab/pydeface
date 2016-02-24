@@ -94,6 +94,8 @@ def main():
         print 'FSL must be installed and FSLDIR environment variable must be defined'
         sys.exit(2)
 
+    # standardize environment for flirt tempfiles
+    os.environ['FSLOUTPUTTYPE'] = 'NIFTI_GZ'
 
     foo,tmpmat=tempfile.mkstemp()
     tmpmat=tmpmat+'.mat'
