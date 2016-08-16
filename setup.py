@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 #
 # Copyright (C) 2013-2015 Russell Poldrack <poldrack@stanford.edu>
 # some portions borrowed from https://github.com/mwaskom/lyman/blob/master/setup.py
@@ -17,13 +17,13 @@ MAINTAINER_EMAIL='poldrack@stanford.edu'
 LICENSE='MIT'
 URL='http://poldracklab.org'
 DOWNLOAD_URL='https://github.com/poldracklab/pydeface/'
-VERSION='1.0'
+VERSION='1.1'
 
 def check_dependencies():
 
     # Just make sure dependencies exist, I haven't rigorously
     # tested what the minimal versions that will work are
-    needed_deps = ["numpy", "nibabel","nipype"]
+    needed_deps = ["numpy", "nibabel", "nipype"]
     missing_deps = []
     for dep in needed_deps:
         try:
@@ -47,7 +47,7 @@ if __name__ == "__main__":
                             'clean'))):
         check_dependencies()
 
-    datafiles = {'pydeface': ['data/facemask.nii.gz','data/mean_reg2mean.nii.gz']}
+    datafiles = {'pydeface': ['data/facemask.nii.gz','data/T1w_template.nii.gz', 'ident.mat']}
 
     setup(name=DISTNAME,
         maintainer=MAINTAINER,
