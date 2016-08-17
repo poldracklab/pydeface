@@ -80,7 +80,8 @@ def main():
     # Command line argument parser
     parser = argparse.ArgumentParser(description='Remove facial structure from MRI images')
     parser.add_argument('-i', '--infile', required=True, help='T1w input image')
-    parser.add_argument('-o', '--outfile', required=False, help='Defaced output image')
+    parser.add_argument('-o', '--outfile', required=False, help='Defaced output image [<infile>_defaced.nii.gz]')
+    parser.add_argument('-s', '--scalefactor', required=False, help='Voxelation scale factor [8.0]')
 
     # Parse command line arguments
     args = parser.parse_args()
@@ -94,23 +95,27 @@ def main():
     else:
         T1w_defaced_fname = T1w_fname.replace('.nii.gz','_defaced.nii.gz')
 
+    if args.scalefactor:
+        vox_sf = float(args.scalefactor)
+    else:
+        vox_sf = 8.0
+
     # Check if output file already exists
-    try:
-        assert not os.path.exists(T1w_defaced_fname)
-    except:
-        raise Exception('%s already exists - remove it first' % T1w_defaced_fname)
+    if os.path.isfile(T1w_defaced_fname):
+        print('%s already exists - remove it first' % T1w_defaced_fname)
+        sys.exit(1)
 
     # Temporary template to individual affine transform matrix
-    _, temp2ind_mat = tempfile.mkstemp()
-    temp2ind_mat += '.mat'
+    _, temp2ind_mat_fname = tempfile.mkstemp()
+    temp2ind_mat_fname += '.mat'
 
     # Temporal face mask in individual space
-    _, indmask_fname = tempfile.mkstemp()
-    indmask_fname += '.nii.gz'
+    _, indmask_fname_fname = tempfile.mkstemp()
+    indmask_fname_fname += '.nii.gz'
 
     # Dummy output data
-    _, dummy_img = tempfile.mkstemp()
-    _, dummy_mat = tempfile.mkstemp()
+    _, dummy_img_fname = tempfile.mkstemp()
+    _, dummy_mat_fname = tempfile.mkstemp()
 
     print('Defacing %s' % T1w_fname)
 
@@ -119,20 +124,20 @@ def main():
     flirt = fsl.FLIRT()
     flirt.inputs.cost_func='mutualinfo'
     flirt.inputs.in_file = T1w_template
-    flirt.inputs.out_matrix_file = temp2ind_mat
+    flirt.inputs.out_matrix_file = temp2ind_mat_fname
     flirt.inputs.reference = T1w_fname
-    # flirt.inputs.out_file = dummy_img
+    flirt.inputs.out_file = dummy_img_fname
     flirt.run()
 
     # Affine transform facemask to infile
     print('Resampling face mask to individual space')
     flirt = fsl.FLIRT()
     flirt.inputs.in_file = facemask
-    flirt.inputs.in_matrix_file = temp2ind_mat
+    flirt.inputs.in_matrix_file = temp2ind_mat_fname
     flirt.inputs.apply_xfm = True
     flirt.inputs.reference = T1w_fname
-    flirt.inputs.out_file = indmask_fname
-    # flirt.inputs.out_matrix_file = dummy_mat
+    flirt.inputs.out_file = indmask_fname_fname
+    flirt.inputs.out_matrix_file = dummy_mat_fname
     flirt.run()
 
     # Load T1w input image
@@ -141,16 +146,16 @@ def main():
     T1w_img = T1w_nii.get_data()
 
     # Voxelate T1w image
-    # 1. Cubic downsample by 8 in each dimension
-    # 2. Nearest neighbor upsample by 8 in each dimension
-    print('Voxelating T1w image')
+    # 1. Cubic downsample
+    # 2. Nearest neighbor upsample
+    print('Voxelating T1w image : scale factor %0.1f' % vox_sf)
     print('  Spline downsampling')
-    T1w_vox_img = nd.interpolation.zoom(T1w_img, zoom=0.125, order=3)
+    T1w_vox_img = nd.interpolation.zoom(T1w_img, zoom=1.0/vox_sf, order=3)
     print('  Nearest neighbor upsampling')
-    T1w_vox_img = nd.interpolation.zoom(T1w_vox_img, zoom=8.0, order=0)
+    T1w_vox_img = nd.interpolation.zoom(T1w_vox_img, zoom=vox_sf, order=0)
 
     # Load individual space face mask
-    indmask_nii = nibabel.load(indmask_fname)
+    indmask_nii = nibabel.load(indmask_fname_fname)
     indmask_img = indmask_nii.get_data()
 
     # Replace face area with voxelated version
@@ -165,9 +170,10 @@ def main():
 
     # Cleanup temporary files
     print('Cleaning up')
-    os.remove(indmask_fname)
-    os.remove(dummy_img)
-    os.remove(dummy_mat)
+    os.remove(temp2ind_mat_fname)
+    os.remove(indmask_fname_fname)
+    os.remove(dummy_img_fname)
+    os.remove(dummy_mat_fname)
 
 
 if __name__ == "__main__":
