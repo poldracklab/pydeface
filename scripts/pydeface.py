@@ -44,7 +44,7 @@ def run_shell_cmd(cmd,cwd=[]):
     else:
         process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     for line in process.stdout:
-             print line.strip()
+             print(line.strip())
     process.wait()
 
 def usage():
@@ -88,10 +88,10 @@ def main():
     except:
         raise Exception('%s already exists, remove it first'%outfile)
 
-    if os.environ.has_key('FSLDIR'):
+    if 'FSLDIR' in os.environ:
         FSLDIR=os.environ['FSLDIR']
     else:
-        print 'FSL must be installed and FSLDIR environment variable must be defined'
+        print('FSL must be installed and FSLDIR environment variable must be defined')
         sys.exit(2)
 
 
@@ -100,12 +100,12 @@ def main():
     foo,tmpfile=tempfile.mkstemp()
     tmpfile=tmpfile+'.nii.gz'
     if verbose:
-        print tmpmat
-        print tmpfile
+        print(tmpmat)
+        print(tmpfile)
     foo,tmpfile2=tempfile.mkstemp()
     foo,tmpmat2=tempfile.mkstemp()
 
-    print 'defacing',infile
+    print('defacing', infile)
     # register template to infile
 
     flirt=fsl.FLIRT()
