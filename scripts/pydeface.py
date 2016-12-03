@@ -44,7 +44,7 @@ def run_shell_cmd(cmd,cwd=[]):
     else:
         process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     for line in process.stdout:
-             print(line.strip())
+             print((line.strip()))
     process.wait()
 
 def usage():
@@ -105,7 +105,7 @@ def main():
     foo,tmpfile2=tempfile.mkstemp()
     foo,tmpmat2=tempfile.mkstemp()
 
-    print('defacing', infile)
+    print(('defacing', infile))
     # register template to infile
 
     flirt=fsl.FLIRT()
