@@ -1,0 +1,17 @@
+Metadata-Version: 1.1
+Name: pydeface
+Version: 1.1
+Summary: pydeface: a script to remove facial structure from MRI images
+Home-page: http://poldracklab.org
+Author: Russ Poldrack
+Author-email: poldrack@stanford.edu
+License: MIT
+Download-URL: https://github.com/poldracklab/pydeface/
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 2.7
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Unix
+Classifier: Operating System :: MacOS
