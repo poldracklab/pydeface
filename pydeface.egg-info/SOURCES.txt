@@ -1,9 +1,0 @@
-MANIFEST.in
-setup.py
-pydeface.egg-info/PKG-INFO
-pydeface.egg-info/SOURCES.txt
-pydeface.egg-info/dependency_links.txt
-pydeface.egg-info/top_level.txt
-pydeface/data/T1w_template.nii.gz
-pydeface/data/facemask.nii.gz
-scripts/pydeface.py
