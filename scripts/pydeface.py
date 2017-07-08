@@ -71,8 +71,8 @@ def main():
         raise Exception('*** Missing facemask : %s'%facemask)
 
     # Check that FSLDIR is set
-    if os.environ.get('FSLDIR'):
-        FSLDIR = os.environ['FSLDIR']
+    if 'FSLDIR' in os.environ:
+        FSLDIR=os.environ['FSLDIR']
     else:
         print('FSL must be installed and FSLDIR environment variable must be defined')
         sys.exit(2)
