@@ -7,9 +7,9 @@ Defacing tool for nifti images.
 
 ### To install:
 ```
-* git clone https://github.com/poldracklab/pydeface.git
-* cd pydeface
-* python setup.py install
+git clone https://github.com/poldracklab/pydeface.git
+cd pydeface
+python setup.py install
 ```
 
 ### To use:
