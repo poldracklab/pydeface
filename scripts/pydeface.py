@@ -3,7 +3,7 @@
 
 Usage:
 ------
-deface <filename to deface> <optional: outfilename>
+pydeface <filename to deface> <optional: outfilename>
 
 """
 
@@ -32,57 +32,25 @@ import nibabel
 import os
 import sys
 import tempfile
-import subprocess
-import inspect
 from nipype.interfaces import fsl
 from pkg_resources import resource_filename, Requirement
 
 
-def run_shell_cmd(cmd, cwd=[]):
-    """Run a command in the shell using Popen."""
-    if cwd:
-        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
-                                   cwd=cwd)
-    else:
-        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-    for line in process.stdout:
-        print((line.strip()))
-    process.wait()
-
-
-def usage():
-    """Print the docstring and exit."""
-    sys.stdout.write(__doc__)
-    sys.exit(2)
-
-
 def main():
-    cleanup = True
-    verbose = False
-
-    # script directory
-    scriptdir = os.path.dirname(os.path.abspath(inspect.getfile(
-        inspect.currentframe())))
+    cleanup, verbose = True, False
 
     template = resource_filename(Requirement.parse("pydeface"),
                                  "pydeface/data/mean_reg2mean.nii.gz")
     facemask = resource_filename(Requirement.parse("pydeface"),
                                  "pydeface/data/facemask.nii.gz")
 
-    try:
-        assert os.path.exists(facemask)
-    except:
-        raise Exception('missing facemask: %s' % facemask)
-
-    try:
-        assert os.path.exists(template)
-    except:
-        raise Exception('missing template: %s' % template)
-
-
+    if not os.path.exists(template):
+        raise Exception('Missing template: %s' % template)
+    if not os.path.exists(facemask):
+        raise Exception('Missing face mask: %s' % facemask)
 
     if len(sys.argv) < 2:
-        usage()
+        sys.stdout.write(__doc__)
         sys.exit(2)
     else:
         infile = sys.argv[1]
@@ -91,15 +59,13 @@ def main():
         outfile = sys.argv[2]
     else:
         outfile = infile.replace('.nii.gz', '_defaced.nii.gz')
-    try:
-        assert not os.path.exists(outfile)
-    except:
-        raise Exception('%s already exists, remove it first' % outfile)
 
-    if 'FSLDIR' in os.environ:
-        FSLDIR = os.environ['FSLDIR']
-    else:
-        print('FSL must be installed and FSLDIR environment variable must be defined.')
+    if os.path.exists(outfile):
+        raise Exception('%s already exists, remove it first.' % outfile)
+
+    if 'FSLDIR' not in os.environ:
+        raise Exception("FSL must be installed and "
+                        "FSLDIR environment variable must be defined.")
         sys.exit(2)
 
     _, tmpmat = tempfile.mkstemp()
@@ -112,7 +78,7 @@ def main():
     _, tmpfile2 = tempfile.mkstemp()
     _, tmpmat2 = tempfile.mkstemp()
 
-    print(('defacing', infile))
+    print('Defacing...\n%s' % infile)
 
     # register template to infile
     flirt = fsl.FLIRT()
@@ -145,6 +111,8 @@ def main():
         os.remove(tmpfile)
         os.remove(tmpfile2)
         os.remove(tmpmat)
+
+    print('Output saved as:\n%s\nFinished.)' % outfile)
 
 
 if __name__ == "__main__":
