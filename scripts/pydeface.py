@@ -3,7 +3,7 @@
 
 Usage:
 ------
-pydeface <filename to deface> <optional: outfilename>
+pydeface.py <filename to deface> <optional: outfilename>
 
 """
 
@@ -33,7 +33,7 @@ import os
 import sys
 import tempfile
 from nipype.interfaces import fsl
-from pkg_resources import resource_filename, Requirement
+from pkg_resources import resource_filename, Requirement, require
 
 
 def main():
@@ -116,4 +116,7 @@ def main():
 
 
 if __name__ == "__main__":
+    welcome_str = 'pydeface ' + require("pydeface")[0].version
+    welcome_decor = '-' * len(welcome_str)
+    print(welcome_decor + '\n' + welcome_str + '\n' + welcome_decor)
     main()
