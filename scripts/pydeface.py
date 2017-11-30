@@ -58,7 +58,7 @@ def main():
     if len(sys.argv) > 2:
         outfile = sys.argv[2]
     else:
-        outfile = infile.replace('.nii.gz', '_defaced.nii.gz')
+        outfile = infile.replace('.nii', '_defaced.nii')
 
     if os.path.exists(outfile):
         raise Exception('%s already exists, remove it first.' % outfile)
@@ -112,7 +112,7 @@ def main():
         os.remove(tmpfile2)
         os.remove(tmpmat)
 
-    print('Output saved as:\n%s\nFinished.)' % outfile)
+    print('Output saved as:\n%s' % outfile)
 
 
 if __name__ == "__main__":
