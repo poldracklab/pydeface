@@ -15,13 +15,13 @@ MAINTAINER_EMAIL = 'poldrack@stanford.edu'
 LICENSE = 'MIT'
 URL = 'http://poldracklab.org'
 DOWNLOAD_URL = 'https://github.com/poldracklab/pydeface/'
-VERSION = '1.1'
+VERSION = '1.2'
 
 if os.path.exists('MANIFEST'):
     os.remove('MANIFEST')
 
-datafiles = {'pydeface': ['data/facemask.nii.gz',
-                          'data/mean_reg2mean.nii.gz']}
+# datafiles = {'pydeface': ['data/facemask.nii.gz',
+#                           'data/mean_reg2mean.nii.gz']}
 
 setup(name=DISTNAME,
       maintainer=MAINTAINER,
@@ -32,8 +32,7 @@ setup(name=DISTNAME,
       url=URL,
       download_url=DOWNLOAD_URL,
       packages=['pydeface'],
-      package_data=datafiles,
-      scripts=['scripts/pydeface.py'],
+      # package_data=datafiles,
       classifiers=['Intended Audience :: Science/Research',
                    'Programming Language :: Python :: 2.7',
                    'License :: OSI Approved :: BSD License',
@@ -41,4 +40,8 @@ setup(name=DISTNAME,
                    'Operating System :: Unix',
                    'Operating System :: MacOS'],
       install_requires=['numpy', 'nibabel', 'nipype'],
+      entry_points={
+            'console_scripts': [
+                'pydeface = pydeface.__main__:main'
+                ]},
       )
