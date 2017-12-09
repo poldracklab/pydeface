@@ -1,4 +1,4 @@
-Defacing tool for nifti images.  
+Defacing tool for nifti images.
 
 ### Requirements:
 - [FSL](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FSL)
@@ -14,5 +14,10 @@ python setup.py install
 
 ### To use:
 ```
-pydeface.py infile.nii.gz
+pydeface infile.nii.gz
+```
+
+Also see the help for additional options:
+```
+pydeface --help
 ```
