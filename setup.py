@@ -17,7 +17,7 @@ MAINTAINER_EMAIL = 'poldrack@stanford.edu'
 LICENSE = 'MIT'
 URL = 'http://poldracklab.org'
 DOWNLOAD_URL = 'https://github.com/poldracklab/pydeface/'
-VERSION = '1.2'
+VERSION = '2.0'
 
 if os.path.exists('MANIFEST'):
     os.remove('MANIFEST')
