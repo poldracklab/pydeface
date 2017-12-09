@@ -2,26 +2,7 @@
 
 import os
 import sys
-import subprocess
 from pkg_resources import resource_filename, Requirement
-
-
-def run_shell_cmd(cmd, cwd=[]):
-    """Run a command in the shell using Popen."""
-    if cwd:
-        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
-                                   cwd=cwd)
-    else:
-        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-    for line in process.stdout:
-        print(line.strip())
-    process.wait()
-
-
-def usage():
-    """Print the docstring and exit."""
-    sys.stdout.write(__doc__)
-    sys.exit(2)
 
 
 def initial_checks(template=None, facemask=None):
@@ -45,7 +26,7 @@ def initial_checks(template=None, facemask=None):
     return template, facemask
 
 
-def check_output_path(outfile, infile, force=False):
+def output_checks(outfile, infile, force=False):
     """Determine output file name."""
     if force is None:
         force = False
