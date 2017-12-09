@@ -1,13 +1,34 @@
 #!/usr/bin/env python
 """Defacing utility for MRI images."""
 
+# Copyright 2011, Russell Poldrack. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#    1. Redistributions of source code must retain the above copyright notice,
+#       this list of conditions and the following disclaimer.
+#    2. Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY RUSSELL POLDRACK ``AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+# EVENT SHALL RUSSELL POLDRACK OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 import argparse
 import os
 import tempfile
 from nipype.interfaces import fsl
 from nibabel import load, Nifti1Image
-from pkg_resources import resource_filename, Requirement, require
-from pydeface.utils import initial_checks, check_output_path
+from pkg_resources import require
+from pydeface.utils import initial_checks, output_checks
 
 
 def main():
@@ -22,12 +43,20 @@ def main():
         help="If not provided adds '_defaced' suffix.")
 
     parser.add_argument(
+        "--force", action='store_true',
+        help="Force to rewrite the output even if it exists.")
+
+    parser.add_argument(
         '--applyto', nargs='+', required=False, metavar='path',
         help='Apply the created face mask to other images.')
 
     parser.add_argument(
-        "--force", action='store_true',
-        help="Force to rewrite the output even if it exists.")
+        "--template", metavar='path', required=False,
+        help="Template image used as the registration target.")
+
+    parser.add_argument(
+        "--facemask", metavar='path', required=False,
+        help="Face mask for the template image.")
 
     parser.add_argument(
         "--nocleanup", action='store_true',
@@ -41,21 +70,16 @@ def main():
     welcome_decor = '-' * len(welcome_str)
     print(welcome_decor + '\n' + welcome_str + '\n' + welcome_decor)
 
-    template = resource_filename(Requirement.parse("pydeface"),
-                                 "pydeface/data/mean_reg2mean.nii.gz")
-    facemask = resource_filename(Requirement.parse("pydeface"),
-                                 "pydeface/data/facemask.nii.gz")
-
-    initial_checks(template, facemask)
     args = parser.parse_args()
+    template, facemask = initial_checks(args.template, args.facemask)
     infile = args.infile
-    outfile = check_output_path(infile, args.outfile, args.force)
+    outfile = output_checks(infile, args.outfile, args.force)
 
     # temporary files
     _, tmpmat = tempfile.mkstemp()
     tmpmat = tmpmat + '.mat'
     _, tmpfile = tempfile.mkstemp()
-    tmpfile = tmpfile + '.nii.gz'
+    tmpfile = tmpfile + '.nii'
     if args.verbose:
         print(tmpmat)
         print(tmpfile)

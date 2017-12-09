@@ -3,6 +3,7 @@
 import os
 import sys
 import subprocess
+from pkg_resources import resource_filename, Requirement
 
 
 def run_shell_cmd(cmd, cwd=[]):
@@ -23,8 +24,15 @@ def usage():
     sys.exit(2)
 
 
-def initial_checks(template, facemask):
+def initial_checks(template=None, facemask=None):
     """Initial sanity checks."""
+    if template is None:
+        template = resource_filename(Requirement.parse("pydeface"),
+                                     "pydeface/data/mean_reg2mean.nii.gz")
+    if facemask is None:
+        facemask = resource_filename(Requirement.parse("pydeface"),
+                                     "pydeface/data/facemask.nii.gz")
+
     if not os.path.exists(template):
         raise Exception('Missing template: %s' % template)
     if not os.path.exists(facemask):
@@ -34,6 +42,7 @@ def initial_checks(template, facemask):
         raise Exception("FSL must be installed and "
                         "FSLDIR environment variable must be defined.")
         sys.exit(2)
+    return template, facemask
 
 
 def check_output_path(outfile, infile, force=False):

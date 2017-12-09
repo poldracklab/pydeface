@@ -20,8 +20,8 @@ VERSION = '1.2'
 if os.path.exists('MANIFEST'):
     os.remove('MANIFEST')
 
-# datafiles = {'pydeface': ['data/facemask.nii.gz',
-#                           'data/mean_reg2mean.nii.gz']}
+datafiles = {'pydeface': ['data/facemask.nii.gz',
+                          'data/mean_reg2mean.nii.gz']}
 
 setup(name=DISTNAME,
       maintainer=MAINTAINER,
@@ -32,7 +32,7 @@ setup(name=DISTNAME,
       url=URL,
       download_url=DOWNLOAD_URL,
       packages=['pydeface'],
-      # package_data=datafiles,
+      package_data=datafiles,
       classifiers=['Intended Audience :: Science/Research',
                    'Programming Language :: Python :: 2.7',
                    'License :: OSI Approved :: BSD License',
