@@ -52,6 +52,10 @@ def main():
              "arguments.")
 
     parser.add_argument(
+        "--cost", metavar='mutualinfo', required=False, default='mutualinfo',
+        help="FSL-FLIRT cost function. Default is 'mutualinfo'.")
+
+    parser.add_argument(
         "--template", metavar='path', required=False,
         help=("Optional template image that will be used as the registration "
               "target instead of the default."))
@@ -92,7 +96,7 @@ def main():
 
     # register template to infile
     flirt = fsl.FLIRT()
-    flirt.inputs.cost_func = 'mutualinfo'
+    flirt.inputs.cost_func = args.cost
     flirt.inputs.in_file = template
     flirt.inputs.out_matrix_file = tmpmat
     flirt.inputs.out_file = tmpfile2
@@ -116,7 +120,7 @@ def main():
     outfile_img = Nifti1Image(outdata, infile_img.get_affine(),
                               infile_img.get_header())
     outfile_img.to_filename(outfile)
-    print('Defaced input saved as:\n  %s' % outfile)
+    print("Defaced image saved as:\n  %s" % outfile)
 
     # apply mask to other given images
     if args.applyto is not None:
@@ -126,7 +130,8 @@ def main():
             outdata = applyfile_img.get_data() * tmpfile_img.get_data()
             applyfile_img = Nifti1Image(outdata, applyfile_img.get_affine(),
                                         applyfile_img.get_header())
-            outfile_img.to_filename(applyfile)
+            outfile = output_checks(applyfile)
+            applyfile_img.to_filename(outfile)
             print('  %s' % applyfile)
 
     if args.nocleanup:

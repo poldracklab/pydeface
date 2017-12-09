@@ -26,10 +26,12 @@ def initial_checks(template=None, facemask=None):
     return template, facemask
 
 
-def output_checks(outfile, infile, force=False):
+def output_checks(infile, outfile=None, force=False):
     """Determine output file name."""
     if force is None:
         force = False
+    if outfile is None:
+        outfile = infile.replace('.nii', '_defaced.nii')
 
     if os.path.exists(outfile) and force:
         print('Previous output will be overwritten.')
@@ -37,5 +39,5 @@ def output_checks(outfile, infile, force=False):
         raise Exception("%s already exists. Remove it first or use '--force' "
                         "flag to overwrite." % outfile)
     else:
-        outfile = infile.replace('.nii', '_defaced.nii')
+        pass
     return outfile
