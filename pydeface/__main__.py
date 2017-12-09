@@ -47,24 +47,27 @@ def main():
         help="Force to rewrite the output even if it exists.")
 
     parser.add_argument(
-        '--applyto', nargs='+', required=False, metavar='path',
-        help='Apply the created face mask to other images.')
+        '--applyto', nargs='+', required=False, metavar='',
+        help="Apply the created face mask to other images. Can take multiple "
+             "arguments.")
 
     parser.add_argument(
         "--template", metavar='path', required=False,
-        help="Template image used as the registration target.")
+        help=("Optional template image that will be used as the registration "
+              "target instead of the default."))
 
     parser.add_argument(
         "--facemask", metavar='path', required=False,
-        help="Face mask for the template image.")
+        help="Optional face mask image that will be used instead of the "
+             "default.")
 
     parser.add_argument(
         "--nocleanup", action='store_true',
-        help="Do not cleanup temporary files.")
+        help="Do not cleanup temporary files. Off by default.")
 
     parser.add_argument(
         "--verbose", action='store_true',
-        help="Show additional status prints.")
+        help="Show additional status prints. Off by default.")
 
     welcome_str = 'pydeface ' + require("pydeface")[0].version
     welcome_decor = '-' * len(welcome_str)
@@ -79,10 +82,9 @@ def main():
     _, tmpmat = tempfile.mkstemp()
     tmpmat = tmpmat + '.mat'
     _, tmpfile = tempfile.mkstemp()
-    tmpfile = tmpfile + '.nii'
+    tmpfile = tmpfile + '.nii.gz'
     if args.verbose:
-        print(tmpmat)
-        print(tmpfile)
+        print("Temporary files:\n  %s\n  %s" % (tmpmat, tmpfile))
     _, tmpfile2 = tempfile.mkstemp()
     _, tmpmat2 = tempfile.mkstemp()
 
