@@ -4,6 +4,8 @@
 #
 # Some portions were borrowed from:
 # https://github.com/mwaskom/lyman/blob/master/setup.py
+# and:
+# https://chriswarrick.com/blog/2014/09/15/python-apps-the-right-way-entry_points-and-scripts/
 
 import os
 from setuptools import setup
@@ -15,7 +17,7 @@ MAINTAINER_EMAIL = 'poldrack@stanford.edu'
 LICENSE = 'MIT'
 URL = 'http://poldracklab.org'
 DOWNLOAD_URL = 'https://github.com/poldracklab/pydeface/'
-VERSION = '1.1'
+VERSION = '2.0'
 
 if os.path.exists('MANIFEST'):
     os.remove('MANIFEST')
@@ -33,7 +35,6 @@ setup(name=DISTNAME,
       download_url=DOWNLOAD_URL,
       packages=['pydeface'],
       package_data=datafiles,
-      scripts=['scripts/pydeface.py'],
       classifiers=['Intended Audience :: Science/Research',
                    'Programming Language :: Python :: 2.7',
                    'License :: OSI Approved :: BSD License',
@@ -41,4 +42,8 @@ setup(name=DISTNAME,
                    'Operating System :: Unix',
                    'Operating System :: MacOS'],
       install_requires=['numpy', 'nibabel', 'nipype'],
+      entry_points={
+            'console_scripts': [
+                'pydeface = pydeface.__main__:main'
+                ]},
       )
