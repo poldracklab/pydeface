@@ -116,7 +116,7 @@ def main():
     # multiply mask by infile and save
     infile_img = load(infile)
     tmpfile_img = load(tmpfile)
-    outdata = infile_img.get_data() * tmpfile_img.get_data()
+    outdata = infile_img.get_data().squeeze() * tmpfile_img.get_data()
     outfile_img = Nifti1Image(outdata, infile_img.get_affine(),
                               infile_img.get_header())
     outfile_img.to_filename(outfile)
