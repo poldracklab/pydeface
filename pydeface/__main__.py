@@ -120,7 +120,7 @@ def main():
     try:
         outdata = infile_img.get_data().squeeze() * tmpfile_img.get_data()
     except ValueError:
-        tmpdata = np.array([tmpfile_img.get_data()]*infile_img.get_data().shape[-1])
+        tmpdata = np.stack([tmpfile_img.get_data()]*infile_img.get_data().shape[-1], axis=-1)
         outdata = infile_img.get_data() * tmpdata
     
     outfile_img = Nifti1Image(outdata, infile_img.get_affine(),
