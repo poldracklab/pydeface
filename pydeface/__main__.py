@@ -25,6 +25,7 @@
 import argparse
 import os
 import tempfile
+import numpy as np
 from nipype.interfaces import fsl
 from nibabel import load, Nifti1Image
 from pkg_resources import require
