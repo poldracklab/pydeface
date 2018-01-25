@@ -25,6 +25,7 @@
 import argparse
 import os
 import tempfile
+import numpy as np
 from nipype.interfaces import fsl
 from nibabel import load, Nifti1Image
 from pkg_resources import require
@@ -116,7 +117,12 @@ def main():
     # multiply mask by infile and save
     infile_img = load(infile)
     tmpfile_img = load(tmpfile)
-    outdata = infile_img.get_data().squeeze() * tmpfile_img.get_data()
+    try:
+        outdata = infile_img.get_data().squeeze() * tmpfile_img.get_data()
+    except ValueError:
+        tmpdata = np.stack([tmpfile_img.get_data()]*infile_img.get_data().shape[-1], axis=-1)
+        outdata = infile_img.get_data() * tmpdata
+    
     outfile_img = Nifti1Image(outdata, infile_img.get_affine(),
                               infile_img.get_header())
     outfile_img.to_filename(outfile)
