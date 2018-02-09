@@ -31,6 +31,63 @@ from nibabel import load, Nifti1Image
 from pkg_resources import require
 from pydeface.utils import initial_checks, output_checks
 
+def deface_image(args):
+
+    template, facemask = initial_checks(args.template, args.facemask)
+    infile = args.infile
+    outfile = output_checks(infile, args.outfile, args.force)
+
+        # temporary files
+    _, tmpmat = tempfile.mkstemp()
+    tmpmat = tmpmat + '.mat'
+    _, tmpfile = tempfile.mkstemp()
+    tmpfile = tmpfile + '.nii.gz'
+    if args.verbose:
+        print("Temporary files:\n  %s\n  %s" % (tmpmat, tmpfile))
+    _, tmpfile2 = tempfile.mkstemp()
+    _, tmpmat2 = tempfile.mkstemp()
+
+    print('Defacing...\n  %s' % args.infile)
+
+    # register template to infile
+    flirt = fsl.FLIRT()
+    flirt.inputs.cost_func = args.cost
+    flirt.inputs.in_file = template
+    flirt.inputs.out_matrix_file = tmpmat
+    flirt.inputs.out_file = tmpfile2
+    flirt.inputs.reference = infile
+    flirt.run()
+
+    # warp facemask to infile
+    flirt = fsl.FLIRT()
+    flirt.inputs.in_file = facemask
+    flirt.inputs.in_matrix_file = tmpmat
+    flirt.inputs.apply_xfm = True
+    flirt.inputs.reference = infile
+    flirt.inputs.out_file = tmpfile
+    flirt.inputs.out_matrix_file = tmpmat2
+    flirt.run()
+
+    # multiply mask by infile and save
+    infile_img = load(infile)
+    tmpfile_img = load(tmpfile)
+    try:
+        outdata = infile_img.get_data().squeeze() * tmpfile_img.get_data()
+    except ValueError:
+        tmpdata = np.stack([tmpfile_img.get_data()]*infile_img.get_data().shape[-1], axis=-1)
+        outdata = infile_img.get_data() * tmpdata
+    
+    outfile_img = Nifti1Image(outdata, infile_img.get_affine(),
+                              infile_img.get_header())
+    outfile_img.to_filename(outfile)
+    print("Defaced image saved as:\n  %s" % outfile)
+
+    if args.nocleanup:
+        pass
+    else:
+        os.remove(tmpfile)
+        os.remove(tmpfile2)
+        os.remove(tmpmat)
 
 def main():
     """Command line call argument parsing."""
@@ -79,54 +136,8 @@ def main():
     print(welcome_decor + '\n' + welcome_str + '\n' + welcome_decor)
 
     args = parser.parse_args()
-    template, facemask = initial_checks(args.template, args.facemask)
-    infile = args.infile
-    outfile = output_checks(infile, args.outfile, args.force)
 
-    # temporary files
-    _, tmpmat = tempfile.mkstemp()
-    tmpmat = tmpmat + '.mat'
-    _, tmpfile = tempfile.mkstemp()
-    tmpfile = tmpfile + '.nii.gz'
-    if args.verbose:
-        print("Temporary files:\n  %s\n  %s" % (tmpmat, tmpfile))
-    _, tmpfile2 = tempfile.mkstemp()
-    _, tmpmat2 = tempfile.mkstemp()
-
-    print('Defacing...\n  %s' % args.infile)
-
-    # register template to infile
-    flirt = fsl.FLIRT()
-    flirt.inputs.cost_func = args.cost
-    flirt.inputs.in_file = template
-    flirt.inputs.out_matrix_file = tmpmat
-    flirt.inputs.out_file = tmpfile2
-    flirt.inputs.reference = infile
-    flirt.run()
-
-    # warp facemask to infile
-    flirt = fsl.FLIRT()
-    flirt.inputs.in_file = facemask
-    flirt.inputs.in_matrix_file = tmpmat
-    flirt.inputs.apply_xfm = True
-    flirt.inputs.reference = infile
-    flirt.inputs.out_file = tmpfile
-    flirt.inputs.out_matrix_file = tmpmat2
-    flirt.run()
-
-    # multiply mask by infile and save
-    infile_img = load(infile)
-    tmpfile_img = load(tmpfile)
-    try:
-        outdata = infile_img.get_data().squeeze() * tmpfile_img.get_data()
-    except ValueError:
-        tmpdata = np.stack([tmpfile_img.get_data()]*infile_img.get_data().shape[-1], axis=-1)
-        outdata = infile_img.get_data() * tmpdata
-    
-    outfile_img = Nifti1Image(outdata, infile_img.get_affine(),
-                              infile_img.get_header())
-    outfile_img.to_filename(outfile)
-    print("Defaced image saved as:\n  %s" % outfile)
+    deface_image(args)
 
     # apply mask to other given images
     if args.applyto is not None:
@@ -139,13 +150,6 @@ def main():
             outfile = output_checks(applyfile)
             applyfile_img.to_filename(outfile)
             print('  %s' % applyfile)
-
-    if args.nocleanup:
-        pass
-    else:
-        os.remove(tmpfile)
-        os.remove(tmpfile2)
-        os.remove(tmpmat)
 
     print('Finished.')
 
