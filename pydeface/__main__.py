@@ -31,63 +31,71 @@ from nibabel import load, Nifti1Image
 from pkg_resources import require
 from pydeface.utils import initial_checks, output_checks
 
-def deface_image(args):
 
+def deface_image(args):
+    """Warp the facemask in template space to that of infile
+    and return the warped mask that was applied."""
     template, facemask = initial_checks(args.template, args.facemask)
     infile = args.infile
     outfile = output_checks(infile, args.outfile, args.force)
 
-        # temporary files
-    _, tmpmat = tempfile.mkstemp()
-    tmpmat = tmpmat + '.mat'
-    _, tmpfile = tempfile.mkstemp()
-    tmpfile = tmpfile + '.nii.gz'
+    # temporary files
+    _, template_reg_mat = tempfile.mkstemp()
+    template_reg_mat = template_reg_mat + '.mat'
+    _, warped_mask = tempfile.mkstemp()
+    warped_mask = warped_mask + '.nii.gz'
     if args.verbose:
-        print("Temporary files:\n  %s\n  %s" % (tmpmat, tmpfile))
-    _, tmpfile2 = tempfile.mkstemp()
-    _, tmpmat2 = tempfile.mkstemp()
+        print("Temporary files:\n  %s\n  %s" % (template_reg_mat, warped_mask))
+    _, template_reg = tempfile.mkstemp()
+    _, warped_mask_mat = tempfile.mkstemp()
 
-    print('Defacing...\n  %s' % args.infile)
+    print('Defacing...\n  %s' % infile)
 
     # register template to infile
     flirt = fsl.FLIRT()
     flirt.inputs.cost_func = args.cost
     flirt.inputs.in_file = template
-    flirt.inputs.out_matrix_file = tmpmat
-    flirt.inputs.out_file = tmpfile2
+    flirt.inputs.out_matrix_file = template_reg_mat
+    flirt.inputs.out_file = template_reg
     flirt.inputs.reference = infile
     flirt.run()
 
     # warp facemask to infile
     flirt = fsl.FLIRT()
     flirt.inputs.in_file = facemask
-    flirt.inputs.in_matrix_file = tmpmat
+    flirt.inputs.in_matrix_file = template_reg_mat
     flirt.inputs.apply_xfm = True
     flirt.inputs.reference = infile
-    flirt.inputs.out_file = tmpfile
-    flirt.inputs.out_matrix_file = tmpmat2
+    flirt.inputs.out_file = warped_mask
+    flirt.inputs.out_matrix_file = warped_mask_mat
     flirt.run()
 
     # multiply mask by infile and save
     infile_img = load(infile)
-    tmpfile_img = load(tmpfile)
+    warped_mask_img = load(warped_mask)
     try:
-        outdata = infile_img.get_data().squeeze() * tmpfile_img.get_data()
+        outdata = infile_img.get_data().squeeze() * warped_mask_img.get_data()
     except ValueError:
-        tmpdata = np.stack([tmpfile_img.get_data()]*infile_img.get_data().shape[-1], axis=-1)
+        tmpdata = np.stack(
+            [warped_mask_img.get_data()] *
+            infile_img.get_data().
+            shape[-1], axis=-1)
         outdata = infile_img.get_data() * tmpdata
-    
-    outfile_img = Nifti1Image(outdata, infile_img.get_affine(),
-                              infile_img.get_header())
-    outfile_img.to_filename(outfile)
-    print("Defaced image saved as:\n  %s" % outfile)
+
+    masked_brain = Nifti1Image(outdata, infile_img.get_affine(),
+                               infile_img.get_header())
+    masked_brain.to_filename(outfile)
 
     if args.nocleanup:
         pass
     else:
-        os.remove(tmpfile)
-        os.remove(tmpfile2)
-        os.remove(tmpmat)
+        os.remove(warped_mask)
+        os.remove(template_reg)
+        os.remove(template_reg_mat)
+
+    print("Defaced image saved as:\n  %s" % outfile)
+    return warped_mask_img
+
 
 def main():
     """Command line call argument parsing."""
@@ -137,14 +145,14 @@ def main():
 
     args = parser.parse_args()
 
-    deface_image(args)
+    warped_mask_img = deface_image(args)
 
     # apply mask to other given images
     if args.applyto is not None:
         print("Defacing mask also applied to:")
         for applyfile in args.applyto:
             applyfile_img = load(applyfile)
-            outdata = applyfile_img.get_data() * tmpfile_img.get_data()
+            outdata = applyfile_img.get_data() * warped_mask_img.get_data()
             applyfile_img = Nifti1Image(outdata, applyfile_img.get_affine(),
                                         applyfile_img.get_header())
             outfile = output_checks(applyfile)
