@@ -92,9 +92,34 @@ def deface_image(args):
         os.remove(warped_mask)
         os.remove(template_reg)
         os.remove(template_reg_mat)
+import sys
+def is_interactive():
+    """Return True if all in/outs are tty"""
+    # TODO: check on windows if hasattr check would work correctly and add value:
+    return sys.stdin.isatty() and sys.stdout.isatty() and sys.stderr.isatty()
+
+
+def setup_exceptionhook():
+    """
+    Overloads default sys.excepthook with our exceptionhook handler.
 
     print("Defaced image saved as:\n  %s" % outfile)
     return warped_mask_img
+    If interactive, our exceptionhook handler will invoke pdb.post_mortem;
+    if not interactive, then invokes default handler.
+    """
+    def _pdb_excepthook(type, value, tb):
+        if is_interactive():
+            import traceback
+            import pdb
+            traceback.print_exception(type, value, tb)
+            # print()
+            pdb.post_mortem(tb)
+        else:
+            lgr.warn(
+              "We cannot setup exception hook since not in interactive mode")
+
+    sys.excepthook = _pdb_excepthook
 
 
 def main():
@@ -139,11 +164,18 @@ def main():
         "--verbose", action='store_true',
         help="Show additional status prints. Off by default.")
 
+    parser.add_argument('--dbg', action='store_true', dest='debug',
+                        help='Do not catch exceptions and show exception '
+                        'traceback')
+
+
     welcome_str = 'pydeface ' + require("pydeface")[0].version
     welcome_decor = '-' * len(welcome_str)
     print(welcome_decor + '\n' + welcome_str + '\n' + welcome_decor)
 
     args = parser.parse_args()
+    if args.debug:
+        setup_exceptionhook()
 
     warped_mask_img = deface_image(args)
 
