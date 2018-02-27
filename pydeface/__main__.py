@@ -24,75 +24,15 @@
 
 import argparse
 import os
-import tempfile
+
 import numpy as np
 from nipype.interfaces import fsl
 from nibabel import load, Nifti1Image
 from pkg_resources import require
-from pydeface.utils import initial_checks, output_checks
-
-
-def deface_image(args):
-    """Warp the facemask in template space to that of infile
-    and return the warped mask that was applied."""
-    template, facemask = initial_checks(args.template, args.facemask)
-    infile = args.infile
-    outfile = output_checks(infile, args.outfile, args.force)
-
-    # temporary files
-    _, template_reg_mat = tempfile.mkstemp()
-    template_reg_mat = template_reg_mat + '.mat'
-    _, warped_mask = tempfile.mkstemp()
-    warped_mask = warped_mask + '.nii.gz'
-    if args.verbose:
-        print("Temporary files:\n  %s\n  %s" % (template_reg_mat, warped_mask))
-    _, template_reg = tempfile.mkstemp()
-    _, warped_mask_mat = tempfile.mkstemp()
-
-    print('Defacing...\n  %s' % infile)
-
-    # register template to infile
-    flirt = fsl.FLIRT()
-    flirt.inputs.cost_func = args.cost
-    flirt.inputs.in_file = template
-    flirt.inputs.out_matrix_file = template_reg_mat
-    flirt.inputs.out_file = template_reg
-    flirt.inputs.reference = infile
-    flirt.run()
-
-    # warp facemask to infile
-    flirt = fsl.FLIRT()
-    flirt.inputs.in_file = facemask
-    flirt.inputs.in_matrix_file = template_reg_mat
-    flirt.inputs.apply_xfm = True
-    flirt.inputs.reference = infile
-    flirt.inputs.out_file = warped_mask
-    flirt.inputs.out_matrix_file = warped_mask_mat
-    flirt.run()
-
-    # multiply mask by infile and save
-    infile_img = load(infile)
-    warped_mask_img = load(warped_mask)
-    try:
-        outdata = infile_img.get_data().squeeze() * warped_mask_img.get_data()
-    except ValueError:
-        tmpdata = np.stack(
-            [warped_mask_img.get_data()] *
-            infile_img.get_data().
-            shape[-1], axis=-1)
-        outdata = infile_img.get_data() * tmpdata
-
-    masked_brain = Nifti1Image(outdata, infile_img.get_affine(),
-                               infile_img.get_header())
-    masked_brain.to_filename(outfile)
-
-    if args.nocleanup:
-        pass
-    else:
-        os.remove(warped_mask)
-        os.remove(template_reg)
-        os.remove(template_reg_mat)
+from pydeface.utils import initial_checks, output_checks, deface_image
 import sys
+
+
 def is_interactive():
     """Return True if all in/outs are tty"""
     # TODO: check on windows if hasattr check would work correctly and add value:
@@ -103,8 +43,6 @@ def setup_exceptionhook():
     """
     Overloads default sys.excepthook with our exceptionhook handler.
 
-    print("Defaced image saved as:\n  %s" % outfile)
-    return warped_mask_img
     If interactive, our exceptionhook handler will invoke pdb.post_mortem;
     if not interactive, then invokes default handler.
     """
@@ -177,7 +115,8 @@ def main():
     if args.debug:
         setup_exceptionhook()
 
-    warped_mask_img = deface_image(args)
+    warped_mask_img, warped_mask, template_reg, template_reg_mat =\
+        deface_image(**vars(args))
 
     # apply mask to other given images
     if args.applyto is not None:
@@ -190,6 +129,12 @@ def main():
             outfile = output_checks(applyfile)
             applyfile_img.to_filename(outfile)
             print('  %s' % applyfile)
+
+    if not args.nocleanup:
+        print('Cleaning up')
+        os.remove(warped_mask)
+        os.remove(template_reg)
+        os.remove(template_reg_mat)
 
     print('Finished.')
 
