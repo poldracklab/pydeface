@@ -102,9 +102,9 @@ def main():
         "--verbose", action='store_true',
         help="Show additional status prints. Off by default.")
 
-    parser.add_argument('--dbg', action='store_true', dest='debug',
+    parser.add_argument('--debug', action='store_true', dest='debug',
                         help='Do not catch exceptions and show exception '
-                        'traceback')
+                        'traceback (Drop into pdb debugger).')
 
 
     welcome_str = 'pydeface ' + require("pydeface")[0].version
