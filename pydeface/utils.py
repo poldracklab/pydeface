@@ -1,14 +1,13 @@
 """Utility scripts for pydeface."""
 
 import os
+import shutil
 import sys
 from pkg_resources import resource_filename, Requirement
 import tempfile
 import numpy as np
 from nipype.interfaces import fsl
 from nibabel import load, Nifti1Image
-
-
 
 
 def initial_checks(template=None, facemask=None):
@@ -42,36 +41,43 @@ def output_checks(infile, outfile=None, force=False):
     if os.path.exists(outfile) and force:
         print('Previous output will be overwritten.')
     elif os.path.exists(outfile):
-        raise Exception("%s already exists. Remove it first or use '--force' "
+        raise Exception("%s already exists. Remove it fi[rst or use '--force' "
                         "flag to overwrite." % outfile)
     else:
         pass
     return outfile
 
 
-
-
-def deface_image(infile=None, outfile=None, facemask=None,
-                 template=None, cost='other', force=False, forcecleanup=False,
-                 verbose=True, **kwargs):
-    if not infile:
-        raise ValueError("infile must be specified")
-
-    template, facemask = initial_checks(template, facemask)
-    outfile = output_checks(infile, outfile, force)
-
-    # temporary files
-    _, template_reg_mat = tempfile.mkstemp()
-    template_reg_mat = template_reg_mat + '.mat'
-    _, warped_mask = tempfile.mkstemp()
-    warped_mask = warped_mask + '.nii.gz'
+def generate_tmpfiles(verbose=True):
+    _, template_reg_mat = tempfile.mkstemp(suffix='.mat')
+    _, warped_mask = tempfile.mkstemp(suffix='.nii.gz')
     if verbose:
         print("Temporary files:\n  %s\n  %s" % (template_reg_mat, warped_mask))
     _, template_reg = tempfile.mkstemp()
     _, warped_mask_mat = tempfile.mkstemp()
+    return template_reg, template_reg_mat, warped_mask, warped_mask_mat
+
+
+def cleanup_files(*args):
+    print("Cleaning up...")
+    for p in args:
+        if os.path.exists(p):
+            os.remove(p)
+
+
+def deface_image(infile=None, outfile=None, facemask=None,
+                 template=None, cost='mutualinfo', force=False,
+                 forcecleanup=False, verbose=True, **kwargs):
+    if not infile:
+        raise ValueError("infile must be specified")
+    if shutil.which('fsl') is None:
+        raise EnvironmentError("fsl cannot be found on the path")
+
+    template, facemask = initial_checks(template, facemask)
+    outfile = output_checks(infile, outfile, force)
+    template_reg, template_reg_mat, warped_mask, warped_mask_mat = generate_tmpfiles()
 
     print('Defacing...\n  %s' % infile)
-
     # register template to infile
     flirt = fsl.FLIRT()
     flirt.inputs.cost_func = cost
@@ -107,12 +113,7 @@ def deface_image(infile=None, outfile=None, facemask=None,
     print("Defaced image saved as:\n  %s" % outfile)
 
     if forcecleanup:
-        print('Cleaning up')
-        os.remove(warped_mask)
-        os.remove(template_reg)
-        os.remove(template_reg_mat)
+        cleanup_files(warped_mask, template_reg, template_reg_mat)
         return warped_mask_img
     else:
-        return warped_mask_img,warped_mask, template_reg, template_reg_mat
-
-
+        return warped_mask_img, warped_mask, template_reg, template_reg_mat
