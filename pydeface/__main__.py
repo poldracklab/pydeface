@@ -29,7 +29,7 @@ import numpy as np
 from nipype.interfaces import fsl
 from nibabel import load, Nifti1Image
 from pkg_resources import require
-from pydeface.utils import initial_checks, output_checks, deface_image
+import pydeface.utils as pdu 
 import sys
 
 
@@ -116,7 +116,7 @@ def main():
         setup_exceptionhook()
 
     warped_mask_img, warped_mask, template_reg, template_reg_mat =\
-        deface_image(**vars(args))
+        pdu.deface_image(**vars(args))
 
     # apply mask to other given images
     if args.applyto is not None:
@@ -126,15 +126,12 @@ def main():
             outdata = applyfile_img.get_data() * warped_mask_img.get_data()
             applyfile_img = Nifti1Image(outdata, applyfile_img.get_affine(),
                                         applyfile_img.get_header())
-            outfile = output_checks(applyfile)
+            outfile = pdu.output_checks(applyfile)
             applyfile_img.to_filename(outfile)
             print('  %s' % applyfile)
 
     if not args.nocleanup:
-        print('Cleaning up')
-        os.remove(warped_mask)
-        os.remove(template_reg)
-        os.remove(template_reg_mat)
+        pdu.cleanup_files(warped_mask, template_reg, template_reg_mat)
 
     print('Finished.')
 
