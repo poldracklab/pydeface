@@ -41,7 +41,7 @@ def output_checks(infile, outfile=None, force=False):
     if os.path.exists(outfile) and force:
         print('Previous output will be overwritten.')
     elif os.path.exists(outfile):
-        raise Exception("%s already exists. Remove it fi[rst or use '--force' "
+        raise Exception("%s already exists. Remove it first or use '--force' "
                         "flag to overwrite." % outfile)
     else:
         pass
@@ -53,8 +53,8 @@ def generate_tmpfiles(verbose=True):
     _, warped_mask = tempfile.mkstemp(suffix='.nii.gz')
     if verbose:
         print("Temporary files:\n  %s\n  %s" % (template_reg_mat, warped_mask))
-    _, template_reg = tempfile.mkstemp()
-    _, warped_mask_mat = tempfile.mkstemp()
+    _, template_reg = tempfile.mkstemp(suffix='.nii.gz')
+    _, warped_mask_mat = tempfile.mkstemp(suffix='.mat')
     return template_reg, template_reg_mat, warped_mask, warped_mask_mat
 
 
@@ -63,6 +63,16 @@ def cleanup_files(*args):
     for p in args:
         if os.path.exists(p):
             os.remove(p)
+
+
+def get_outfile_type(outpath):
+    # Returns fsl output type for passing to fsl's flirt
+    if outpath.endswith('nii.gz'):
+        return 'NIFTI_GZ'
+    elif outpath.endswith('nii'):
+        return 'NIFTI'
+    else:
+        raise ValueError('outfile path should be have .nii or .nii.gz suffix')
 
 
 def deface_image(infile=None, outfile=None, facemask=None,
@@ -79,14 +89,17 @@ def deface_image(infile=None, outfile=None, facemask=None,
 
     print('Defacing...\n  %s' % infile)
     # register template to infile
+    outfile_type = get_outfile_type(template_reg)
     flirt = fsl.FLIRT()
     flirt.inputs.cost_func = cost
     flirt.inputs.in_file = template
     flirt.inputs.out_matrix_file = template_reg_mat
     flirt.inputs.out_file = template_reg
+    flirt.inputs.output_type = outfile_type
     flirt.inputs.reference = infile
     flirt.run()
 
+    outfile_type = get_outfile_type(warped_mask)
     # warp facemask to infile
     flirt = fsl.FLIRT()
     flirt.inputs.in_file = facemask
@@ -94,6 +107,7 @@ def deface_image(infile=None, outfile=None, facemask=None,
     flirt.inputs.apply_xfm = True
     flirt.inputs.reference = infile
     flirt.inputs.out_file = warped_mask
+    flirt.inputs.output_type = outfile_type
     flirt.inputs.out_matrix_file = warped_mask_mat
     flirt.run()
 

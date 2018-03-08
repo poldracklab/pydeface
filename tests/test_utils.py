@@ -27,6 +27,13 @@ def test_generate_tmpfiles():
         os.remove(f)
 
 
+def test_get_outfile_type():
+    assert pdu.get_outfile_type('path.nii.gz') == 'NIFTI_GZ'
+    assert pdu.get_outfile_type('path.nii') == 'NIFTI'
+    with pytest.raises(ValueError):
+        pdu.get_outfile_type('path.suffix')
+
+
 def test_deface_image():
     if which('fsl'):
         test_img = (
@@ -36,7 +43,10 @@ def test_deface_image():
                 'tests',
                 'data',
                 'ds000031_sub-01_ses-006_run-001_T1w.nii.gz').as_posix())
-        pdu.deface_image(test_img)
+        pdu.deface_image(test_img,forcecleanup=True,force=True)
+        pdu.cleanup_files(test_img)
+
+
     else:
         pytest.skip("no fsl to run defacing.")
 
