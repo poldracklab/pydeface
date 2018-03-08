@@ -23,13 +23,9 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import argparse
-import os
-
-import numpy as np
-from nipype.interfaces import fsl
 from nibabel import load, Nifti1Image
 from pkg_resources import require
-import pydeface.utils as pdu 
+import pydeface.utils as pdu
 import sys
 
 
@@ -55,7 +51,7 @@ def setup_exceptionhook():
             pdb.post_mortem(tb)
         else:
             lgr.warn(
-              "We cannot setup exception hook since not in interactive mode")
+                "We cannot setup exception hook since not in interactive mode")
 
     sys.excepthook = _pdb_excepthook
 
@@ -105,7 +101,6 @@ def main():
     parser.add_argument('--debug', action='store_true', dest='debug',
                         help='Do not catch exceptions and show exception '
                         'traceback (Drop into pdb debugger).')
-
 
     welcome_str = 'pydeface ' + require("pydeface")[0].version
     welcome_decor = '-' * len(welcome_str)
