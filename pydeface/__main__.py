@@ -27,6 +27,7 @@ from nibabel import load, Nifti1Image
 from pkg_resources import require
 import pydeface.utils as pdu
 import sys
+import shutil
 
 
 def is_interactive():
@@ -127,6 +128,11 @@ def main():
 
     if not args.nocleanup:
         pdu.cleanup_files(warped_mask, template_reg, template_reg_mat)
+    else:
+        unclean_mask = infile.replace('.nii','_pydeface_mask.nii')
+        unclean_mat = infile.replace('.gz','').replace('.nii','_pydeface.mat')
+        shutil.move(warped_mask, unclean_mask)
+        shutil.move(template_reg_mat, unclean_mat)
 
     print('Finished.')
 
