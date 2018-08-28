@@ -1,0 +1,11 @@
+version: 2
+jobs:
+  build:
+    machine: true
+    steps:
+      - checkout
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run: docker build -t poldracklab/pydeface:$CIRCLE_BUILD_NUM-${CIRCLE_SHA1:0:6} -f Dockerfile .
+      - run: docker run -it poldracklab/pydeface pytest pydeface
+      - run: docker tag poldracklab/pydeface:$CIRCLE_BUILD_NUM-${CIRCLE_SHA1:0:6} poldracklab/pydeface:latest
+      - run: docker push poldracklab/pydeface
