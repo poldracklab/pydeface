@@ -88,7 +88,7 @@ RUN conda create -y -q --name neuro --channel conda-forge python \
                                                           nibabel \
     && sync && conda clean -tipsy && sync \
     && /bin/bash -c "source activate neuro \
-      && pip install -e -q --no-cache-dir git+git://github.com/poldracklab/pydeface.git" \
+      && pip install -q --no-cache-dir git+https://github.com/poldracklab/pydeface.git" \
     && sync \
     && sed -i '$isource activate neuro' $ND_ENTRYPOINT
 
