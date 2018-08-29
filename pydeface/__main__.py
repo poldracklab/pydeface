@@ -28,6 +28,7 @@ from pkg_resources import require
 import pydeface.utils as pdu
 import sys
 import shutil
+import numpy as np
 
 
 def is_interactive():
@@ -119,10 +120,15 @@ def main():
         print("Defacing mask also applied to:")
         for applyfile in args.applyto:
             applyfile_img = load(applyfile)
-            outdata = applyfile_img.get_data() * warped_mask_img.get_data()
+            try:
+                outdata = applyfile_img.get_data() * warped_mask_img.get_data()
+            except ValueError:
+                tmpdata = np.stack([warped_mask_img.get_data()] *
+                           applyfile_img.get_data().shape[-1], axis=-1)
+                outdata = applyfile_img.get_data() * tmpdata
             applyfile_img = Nifti1Image(outdata, applyfile_img.get_affine(),
                                         applyfile_img.get_header())
-            outfile = pdu.output_checks(applyfile)
+            outfile = pdu.output_checks(applyfile, force=args.force)
             applyfile_img.to_filename(outfile)
             print('  %s' % applyfile)
 
