@@ -23,13 +23,39 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import argparse
-import os
-import tempfile
-import numpy as np
-from nipype.interfaces import fsl
 from nibabel import load, Nifti1Image
 from pkg_resources import require
-from pydeface.utils import initial_checks, output_checks
+import pydeface.utils as pdu
+import sys
+import shutil
+import numpy as np
+
+
+def is_interactive():
+    """Return True if all in/outs are tty"""
+    # TODO: check on windows if hasattr check would work correctly and add value:
+    return sys.stdin.isatty() and sys.stdout.isatty() and sys.stderr.isatty()
+
+
+def setup_exceptionhook():
+    """
+    Overloads default sys.excepthook with our exceptionhook handler.
+
+    If interactive, our exceptionhook handler will invoke pdb.post_mortem;
+    if not interactive, then invokes default handler.
+    """
+    def _pdb_excepthook(type, value, tb):
+        if is_interactive():
+            import traceback
+            import pdb
+            traceback.print_exception(type, value, tb)
+            # print()
+            pdb.post_mortem(tb)
+        else:
+            lgr.warn(
+                "We cannot setup exception hook since not in interactive mode")
+
+    sys.excepthook = _pdb_excepthook
 
 
 def main():
@@ -74,78 +100,45 @@ def main():
         "--verbose", action='store_true',
         help="Show additional status prints. Off by default.")
 
+    parser.add_argument('--debug', action='store_true', dest='debug',
+                        help='Do not catch exceptions and show exception '
+                        'traceback (Drop into pdb debugger).')
+
     welcome_str = 'pydeface ' + require("pydeface")[0].version
     welcome_decor = '-' * len(welcome_str)
     print(welcome_decor + '\n' + welcome_str + '\n' + welcome_decor)
 
     args = parser.parse_args()
-    template, facemask = initial_checks(args.template, args.facemask)
-    infile = args.infile
-    outfile = output_checks(infile, args.outfile, args.force)
+    if args.debug:
+        setup_exceptionhook()
 
-    # temporary files
-    _, tmpmat = tempfile.mkstemp()
-    tmpmat = tmpmat + '.mat'
-    _, tmpfile = tempfile.mkstemp()
-    tmpfile = tmpfile + '.nii.gz'
-    if args.verbose:
-        print("Temporary files:\n  %s\n  %s" % (tmpmat, tmpfile))
-    _, tmpfile2 = tempfile.mkstemp()
-    _, tmpmat2 = tempfile.mkstemp()
-
-    print('Defacing...\n  %s' % args.infile)
-
-    # register template to infile
-    flirt = fsl.FLIRT()
-    flirt.inputs.cost_func = args.cost
-    flirt.inputs.in_file = template
-    flirt.inputs.out_matrix_file = tmpmat
-    flirt.inputs.out_file = tmpfile2
-    flirt.inputs.reference = infile
-    flirt.run()
-
-    # warp facemask to infile
-    flirt = fsl.FLIRT()
-    flirt.inputs.in_file = facemask
-    flirt.inputs.in_matrix_file = tmpmat
-    flirt.inputs.apply_xfm = True
-    flirt.inputs.reference = infile
-    flirt.inputs.out_file = tmpfile
-    flirt.inputs.out_matrix_file = tmpmat2
-    flirt.run()
-
-    # multiply mask by infile and save
-    infile_img = load(infile)
-    tmpfile_img = load(tmpfile)
-    try:
-        outdata = infile_img.get_data().squeeze() * tmpfile_img.get_data()
-    except ValueError:
-        tmpdata = np.stack([tmpfile_img.get_data()]*infile_img.get_data().shape[-1], axis=-1)
-        outdata = infile_img.get_data() * tmpdata
-    
-    outfile_img = Nifti1Image(outdata, infile_img.get_affine(),
-                              infile_img.get_header())
-    outfile_img.to_filename(outfile)
-    print("Defaced image saved as:\n  %s" % outfile)
+    warped_mask_img, warped_mask, template_reg, template_reg_mat =\
+        pdu.deface_image(**vars(args))
 
     # apply mask to other given images
     if args.applyto is not None:
         print("Defacing mask also applied to:")
         for applyfile in args.applyto:
             applyfile_img = load(applyfile)
-            outdata = applyfile_img.get_data() * tmpfile_img.get_data()
+            try:
+                outdata = applyfile_img.get_data() * warped_mask_img.get_data()
+            except ValueError:
+                tmpdata = np.stack([warped_mask_img.get_data()] *
+                           applyfile_img.get_data().shape[-1], axis=-1)
+                outdata = applyfile_img.get_data() * tmpdata
             applyfile_img = Nifti1Image(outdata, applyfile_img.get_affine(),
                                         applyfile_img.get_header())
-            outfile = output_checks(applyfile)
+            outfile = pdu.output_checks(applyfile, force=args.force)
             applyfile_img.to_filename(outfile)
             print('  %s' % applyfile)
 
-    if args.nocleanup:
-        pass
+    if not args.nocleanup:
+        pdu.cleanup_files(warped_mask, template_reg, template_reg_mat)
     else:
-        os.remove(tmpfile)
-        os.remove(tmpfile2)
-        os.remove(tmpmat)
+        unclean_mask = args.infile.replace('.gz', '').replace('.nii','_pydeface_mask.nii.gz')
+        unclean_mat = args.infile.replace('.gz','').replace('.nii','_pydeface.mat')
+        shutil.move(warped_mask, unclean_mask)
+        shutil.move(template_reg_mat, unclean_mat)
 
     print('Finished.')
 
