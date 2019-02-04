@@ -80,6 +80,14 @@ RUN echo "Downloading Miniconda installer ..." \
     && conda update -n base conda \
     && conda clean -tipsy && sync
 
+#-------------
+# Copy in code
+#-------------
+COPY . /pydeface
+USER root 
+RUN chown -R neuro:users /pydeface
+USER neuro
+
 #-------------------------
 # Create conda environment
 #-------------------------
@@ -88,9 +96,8 @@ RUN conda create -y -q --name neuro --channel conda-forge python \
                                                           nibabel \
                                                           pytest \
     && sync && conda clean -tipsy && sync \
-    && cd /home/neuro && git clone https://github.com/poldracklab/pydeface \
     && /bin/bash -c "source activate neuro \
-      && pip install -e /home/neuro/pydeface" \
+      && pip install -e /pydeface" \
     && sync \
     && sed -i '$isource activate neuro' $ND_ENTRYPOINT
 
