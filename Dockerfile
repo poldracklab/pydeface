@@ -86,9 +86,11 @@ RUN echo "Downloading Miniconda installer ..." \
 RUN conda create -y -q --name neuro --channel conda-forge python \
                                                           nipype \
                                                           nibabel \
+                                                          pytest \
     && sync && conda clean -tipsy && sync \
+    && cd /home/neuro && git clone https://github.com/poldracklab/pydeface \
     && /bin/bash -c "source activate neuro \
-      && pip install -q --no-cache-dir git+https://github.com/poldracklab/pydeface.git" \
+      && pip install -e /home/neuro/pydeface" \
     && sync \
     && sed -i '$isource activate neuro' $ND_ENTRYPOINT
 
@@ -131,7 +133,7 @@ RUN echo '{ \
     \n      { \
     \n        "env_name": "neuro", \
     \n        "conda_opts": "--channel conda-forge", \
-    \n        "conda_install": "python nipype nibabel", \
+    \n        "conda_install": "python nipype nibabel pytest", \
     \n        "pip_install": "git+git://github.com/poldracklab/pydeface.git", \
     \n        "activate": true \
     \n      } \
