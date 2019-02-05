@@ -7,7 +7,6 @@ jobs:
       - run:
           name: Docker Bulid and Test
           command: |
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker build -t poldracklab/pydeface:$CIRCLE_BUILD_NUM-${CIRCLE_SHA1:0:6} -f Dockerfile .
             docker run -it poldracklab/pydeface:$CIRCLE_BUILD_NUM-${CIRCLE_SHA1:0:6} pytest /pydeface
              
