@@ -1,16 +1,10 @@
 """Utility scripts for pydeface."""
 
-import os
-import shutil
 import sys
-from pkg_resources import resource_filename, Requirement
-import tempfile
 import numpy as np
 from nipype.interfaces import fsl
 from nipype.interfaces.io import DataSink
-from nibabel import load, Nifti1Image
 from nipype import Node, MapNode, Function, Workflow
-
 
 
 def initial_checks(template=None, facemask=None, infile=None, outfile=None, force=False, applyto=None):
@@ -33,7 +27,7 @@ def initial_checks(template=None, facemask=None, infile=None, outfile=None, forc
         raise Exception("FSL must be installed and "
                         "FSLDIR environment variable must be defined.")
         sys.exit(2)
-    
+
     # Inline function definition, because nipype
     def output_checks(infile, outfile, force):
         if force is None:
@@ -49,7 +43,7 @@ def initial_checks(template=None, facemask=None, infile=None, outfile=None, forc
         else:
             pass
         return outfile
-    
+
     outfile = output_checks(infile, outfile, force)
     if applyto is not None:
         applyto_outfiles = [output_checks(f, None, force) for f in applyto]
@@ -77,7 +71,8 @@ def get_outfile_type(outpath):
 
 
 def deface(infile, warped_mask, outfile):
-    import numpy, nibabel
+    import numpy
+    import nibabel
     # multiply mask by infile and save
     infile_img = nibabel.load(infile)
     warped_mask_img = nibabel.load(warped_mask)
@@ -85,11 +80,11 @@ def deface(infile, warped_mask, outfile):
         outdata = infile_img.get_data().squeeze() * warped_mask_img.get_data()
     except ValueError:
         tmpdata = numpy.stack([warped_mask_img.get_data()] *
-                           infile_img.get_data().shape[-1], axis=-1)
+                              infile_img.get_data().shape[-1], axis=-1)
         outdata = infile_img.get_data() * tmpdata
 
     masked_brain = nibabel.Nifti1Image(outdata, infile_img.affine,
-                               infile_img.header)
+                                       infile_img.header)
     masked_brain.to_filename(outfile)
     print("Defaced image saved as:\n  %s" % outfile)
     return warped_mask_img
@@ -98,29 +93,29 @@ def deface(infile, warped_mask, outfile):
 def deface_follower(applyfile, warped_mask_img, outfile):
     import nibabel
     applyfile_img = nibabel.load(applyfile)
-    
+
     try:
         outdata = applyfile_img.get_data() * warped_mask_img.get_data()
     except ValueError:
         tmpdata = np.stack([warped_mask_img.get_data()] *
-                   applyfile_img.get_data().shape[-1], axis=-1)
+                           applyfile_img.get_data().shape[-1], axis=-1)
         outdata = applyfile_img.get_data() * tmpdata
     applyfile_img = nibabel.Nifti1Image(outdata, applyfile_img.affine,
                                         applyfile_img.header)
     applyfile_img.to_filename(outfile)
     print('  %s' % applyfile)
-    
+
 
 def append_follower_wf(defacewf, applyto):
     # add the applytos to the input check node
     # Doing this at the top of the workflow checks that outputs
     # don't exist before running everything
     ic_node = defacewf.get_node('initial_checks')
-    ic_node.inputs.applyto=applyto
-    
+    ic_node.inputs.applyto = applyto
+
     # Grab the deface node
     deface_node = defacewf.get_node('deface')
-    
+
     # Create a map node to take care of follower images
     follower = Function(inputs=['applyfile', 'warped_mask_img', 'outfile'],
                         outputs=[],
@@ -131,7 +126,7 @@ def append_follower_wf(defacewf, applyto):
     ################ Modify defacewf connections ################
     defacewf.connect([(deface_node, follower_node, [('warped_mask_img', 'warped_mask_img')]),
                       (ic_node, follower_node, [('applyto_outfiles', 'outfile')])])
-    
+
     return defacewf
 
 
@@ -139,15 +134,14 @@ def make_deface_workflow(infile=None, outfile=None, facemask=None,
                          template=None, cost='mutualinfo', force=False,
                          nocleanup=False, verbose=True, output_dir=None,
                          **kwargs):
-    
     # Instantiate nodes and fill in inputs
     # Initial checks node
-    ic_node =  Node(Function(input_names=['infile', 'template', 
-                                          'facemask', 'outfile', 
-                                          'force', 'applyto'],
-                                 output_names=['template','facemask', 'outfile', 'applyto_outfiles'],
-                                 function=initial_checks),
-                    name="initial_checks")
+    ic_node = Node(Function(input_names=['infile', 'template',
+                                         'facemask', 'outfile',
+                                         'force', 'applyto'],
+                            output_names=['template', 'facemask', 'outfile', 'applyto_outfiles'],
+                            function=initial_checks),
+                   name="initial_checks")
     ic_node.inputs.template = template
     ic_node.inputs.facemask = facemask
     ic_node.inputs.infile = infile
@@ -160,10 +154,10 @@ def make_deface_workflow(infile=None, outfile=None, facemask=None,
                              output_names=['output_type'],
                              function=get_outfile_type)
     got_reg_node = Node(got_interface,
-                    name='get_outfile_type_reg')
+                        name='get_outfile_type_reg')
     got_reg_node.inputs.outpath = infile
     got_apply_node = Node(got_interface,
-                    name='get_outfile_type_apply')
+                          name='get_outfile_type_apply')
     got_apply_node.inputs.outpath = infile
 
     # Flirt to register template to input file
@@ -183,7 +177,7 @@ def make_deface_workflow(infile=None, outfile=None, facemask=None,
                                 output_names=['warped_mask_img'],
                                 function=deface),
                        name='deface')
-    deface_node.inputs.infile=infile
+    deface_node.inputs.infile = infile
 
     # The datasink workflow makes outputs available after the workflow completes
     datasink = Node(DataSink(), name='sinker')
@@ -200,10 +194,10 @@ def make_deface_workflow(infile=None, outfile=None, facemask=None,
                       (got_apply_node, flirt_apply, [('output_type', 'output_type')]),
                       (flirt_reg, flirt_apply, [('out_matrix_file', 'in_matrix_file')]),
                       (flirt_apply, deface_node, [('out_file', 'warped_mask')])
-                     ])
+                      ])
     if nocleanup:
         defacewf.connect([(flirt_apply, datasink, [('out_file', 'defacing_files.@warped_mask')]),
                           (flirt_reg, datasink, [('out_file', 'defacing_files.@template_reg'),
-                                                ('out_matrix_file', 'defacing_files.@template_reg_mat')])])
+                                                 ('out_matrix_file', 'defacing_files.@template_reg_mat')])])
     ######## End of nipype workflow assembly ########
     return defacewf

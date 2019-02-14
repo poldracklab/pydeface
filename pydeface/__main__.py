@@ -23,12 +23,10 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import argparse
-from nibabel import load, Nifti1Image
 from pkg_resources import require
 import pydeface.utils as pdu
 import sys
 import shutil
-import numpy as np
 
 
 def is_interactive():
@@ -118,7 +116,7 @@ def main():
     if args.applyto is not None:
         defacewf = pdu.append_follower_wf(defacewf, args.applyto)
 
-    deface_res = defacwewf.run()
+    deface_res = defacewf.run()
 
     if args.nocleanup:
         warped_mask = list(deface_res.nodes())[6].result.otputs[0]

@@ -1,7 +1,6 @@
 import pydeface.utils as pdu
 from shutil import which
 import tempfile
-import os
 import pytest
 from pathlib import Path
 import urllib.request
@@ -16,13 +15,6 @@ def test_cleanup_files():
     pdu.cleanup_files(*files[1:])
     # should not fail if files do not exist
     pdu.cleanup_files(*files)
-
-
-# def test_generate_tmpfiles():
-#     files = pdu.generate_tmpfiles()
-#     for f in files:
-#         assert os.path.exists(f)
-#         os.remove(f)
 
 
 def test_get_outfile_type():
