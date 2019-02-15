@@ -119,7 +119,7 @@ def main():
     deface_res = defacewf.run()
 
     if args.nocleanup:
-        warped_mask = list(deface_res.nodes())[6].result.otputs[0]
+        warped_mask = list(deface_res.nodes())[6].result.outputs[0]
         template_reg_mat = list(deface_res.nodes())[6].result.otputs[2]
         unclean_mask = args.infile.replace('.gz', '').replace('.nii', '_pydeface_mask.nii.gz')
         unclean_mat = args.infile.replace('.gz','').replace('.nii', '_pydeface.mat')
