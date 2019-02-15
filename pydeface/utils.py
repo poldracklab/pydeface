@@ -136,10 +136,7 @@ def make_deface_workflow(infile=None, outfile=None, facemask=None,
                          **kwargs):
     # Instantiate nodes and fill in inputs
     # Initial checks node
-    ic_node = Node(Function(input_names=['infile', 'template',
-                                         'facemask', 'outfile',
-                                         'force', 'applyto'],
-                            output_names=['template', 'facemask', 'outfile', 'applyto_outfiles'],
+    ic_node = Node(Function(output_names=['template', 'facemask', 'outfile', 'applyto_outfiles'],
                             function=initial_checks),
                    name="initial_checks")
     ic_node.inputs.template = template
@@ -150,8 +147,7 @@ def make_deface_workflow(infile=None, outfile=None, facemask=None,
     ic_node.inputs.applyto = None
 
     # Figure out the output type for flirt based on the output file
-    got_interface = Function(input_names=['outpath'],
-                             output_names=['output_type'],
+    got_interface = Function(output_names=['output_type'],
                              function=get_outfile_type)
     got_reg_node = Node(got_interface,
                         name='get_outfile_type_reg')
@@ -171,10 +167,7 @@ def make_deface_workflow(infile=None, outfile=None, facemask=None,
     flirt_apply.inputs.reference = infile
 
     # The deface function multiplies the infile by the warped mask
-    deface_node = Node(Function(input_names=['infile',
-                                             'warped_mask',
-                                             'outfile'],
-                                output_names=['warped_mask_img'],
+    deface_node = Node(Function(output_names=['warped_mask_img'],
                                 function=deface),
                        name='deface')
     deface_node.inputs.infile = infile
