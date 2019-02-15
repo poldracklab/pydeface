@@ -117,8 +117,7 @@ def append_follower_wf(defacewf, applyto):
     deface_node = defacewf.get_node('deface')
 
     # Create a map node to take care of follower images
-    follower = Function(inputs=['applyfile', 'warped_mask_img', 'outfile'],
-                        outputs=[],
+    follower = Function(output_names=[],
                         function=deface_follower)
     follower_node = MapNode(follower, ['applyfile', 'outfile'], 'follower')
     follower_node.inputs.applyfile = applyto
