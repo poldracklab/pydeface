@@ -110,7 +110,7 @@ def main():
     if args.debug:
         setup_exceptionhook()
 
-    defacewf = pdu.make_deface_workflow(run_wf=True, **vars(args))
+    defacewf = pdu.make_deface_workflow(**vars(args))
 
     # apply mask to other given images
     if args.applyto is not None:
@@ -119,8 +119,9 @@ def main():
     deface_res = defacewf.run()
 
     if args.nocleanup:
-        warped_mask = list(deface_res.nodes())[6].result.outputs[0]
-        template_reg_mat = list(deface_res.nodes())[6].result.otputs[2]
+        sinker_res = [nn for nn in list(deface_res.nodes()) if nn.name=='sinker'][0].result
+        warped_mask = sinker_res.outputs.out_file[0]
+        template_reg_mat = sinker_res.outputs.out_file[2]
         unclean_mask = args.infile.replace('.gz', '').replace('.nii', '_pydeface_mask.nii.gz')
         unclean_mat = args.infile.replace('.gz','').replace('.nii', '_pydeface.mat')
         shutil.move(warped_mask, unclean_mask)
