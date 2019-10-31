@@ -1,4 +1,19 @@
 #!/usr/bin/env python
+"""Developer notes
+
+- Prepare for pypi:
+python setup.py sdist
+
+- Upload to pypi test server to check:
+twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+- Use testpypi with pip:
+pip install --index-url https://test.pypi.org/simple/ pydeface
+
+- Upload to pypi
+twine upload dist/*
+"""
+
 
 import os
 from setuptools import setup
@@ -25,7 +40,7 @@ setup(name='pydeface',
       license='MIT',
       version=VERSION,
       url='http://poldracklab.org',
-      download_url=('https://github.com/poldracklab/pydeface/archive'
+      download_url=('https://github.com/poldracklab/pydeface/archive/'
                     + VERSION + '.tar.gz'),
       packages=['pydeface'],
       package_data=datafiles,
