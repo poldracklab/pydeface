@@ -5,8 +5,9 @@ A defacing tool for MRI nifti images.
 
 | Package                                          | Tested version |
 |--------------------------------------------------|----------------|
-| [Python 3](https://www.python.org/downloads/)    | 3.7.3          |
 | [FSL](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FSL)| 6.0.2          |
+| [Python 3](https://www.python.org/downloads/)    | 3.7.3          |
+| [NumPy](http://www.numpy.org/)                   | 1.17.1         |
 | [NiBabel](http://nipy.org/nibabel/)              | 2.5.1          |
 | [Nipype](http://nipype.readthedocs.io/en/latest/)| 1.3.0-rc1      |
 
