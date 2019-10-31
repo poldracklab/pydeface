@@ -28,4 +28,4 @@ pydeface --help
 ```
 
 ## License
-Nibabel is licensed under the [MIT license](LICENSE.txt).
+PyDeface is licensed under [MIT license](LICENSE.txt).
