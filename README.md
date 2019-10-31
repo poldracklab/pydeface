@@ -1,8 +1,7 @@
 # PyDeface
-A defacing tool for MRI nifti images.
+A tool to remove facial structure from MRI images.
 
 ## Dependencies:
-
 | Package                                          | Tested version |
 |--------------------------------------------------|----------------|
 | [FSL](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FSL)| 6.0.2          |
@@ -29,4 +28,4 @@ pydeface --help
 ```
 
 ## License
-Nibabel is licensed under the [MIT license](/LICENSE).
+Nibabel is licensed under the [MIT license](/LICENSE.txt).
