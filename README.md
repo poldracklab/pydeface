@@ -1,3 +1,5 @@
+<img src="/visuals/logo.svg" width=200 align="right" />
+
 # PyDeface
 A tool to remove facial structure from MRI images.
 
