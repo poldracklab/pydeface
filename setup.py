@@ -1,11 +1,4 @@
 #!/usr/bin/env python
-#
-# Copyright (C) 2013-2015 Russell Poldrack <poldrack@stanford.edu>
-#
-# Some portions were borrowed from:
-# https://github.com/mwaskom/lyman/blob/master/setup.py
-# and:
-# https://chriswarrick.com/blog/2014/09/15/python-apps-the-right-way-entry_points-and-scripts/
 
 import os
 from setuptools import setup
