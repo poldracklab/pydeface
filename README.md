@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/47563497.svg)](https://zenodo.org/badge/latestdoi/47563497)
+
 <img src="/visuals/logo.svg" width=250 align="right" />
 
 # PyDeface
