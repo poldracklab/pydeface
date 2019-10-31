@@ -10,13 +10,6 @@
 import os
 from setuptools import setup
 
-DISTNAME = "pydeface"
-DESCRIPTION = "pydeface: a script to remove facial structure from MRI images."
-MAINTAINER = 'Russ Poldrack'
-MAINTAINER_EMAIL = 'poldrack@stanford.edu'
-LICENSE = 'MIT'
-URL = 'http://poldracklab.org'
-DOWNLOAD_URL = 'https://github.com/poldracklab/pydeface/'
 VERSION = '2.0.0'
 
 if os.path.exists('MANIFEST'):
@@ -25,14 +18,15 @@ if os.path.exists('MANIFEST'):
 datafiles = {'pydeface': ['data/facemask.nii.gz',
                           'data/mean_reg2mean.nii.gz']}
 
-setup(name=DISTNAME,
-      maintainer=MAINTAINER,
-      maintainer_email=MAINTAINER_EMAIL,
-      description=DESCRIPTION,
-      license=LICENSE,
+setup(name='pydeface',
+      maintainer='Russ Poldrack',
+      maintainer_email='poldrack@stanford.edu',
+      description='A script to remove facial structure from MRI images.',
+      license='MIT',
       version=VERSION,
-      url=URL,
-      download_url=DOWNLOAD_URL,
+      url='http://poldracklab.org',
+      download_url=('https://github.com/poldracklab/pydeface/archive'
+                    + VERSION + '.tar.gz')
       packages=['pydeface'],
       package_data=datafiles,
       classifiers=['Intended Audience :: Science/Research',
