@@ -19,7 +19,7 @@ setup(name='pydeface',
       version=VERSION,
       url='http://poldracklab.org',
       download_url=('https://github.com/poldracklab/pydeface/archive'
-                    + VERSION + '.tar.gz')
+                    + VERSION + '.tar.gz'),
       packages=['pydeface'],
       package_data=datafiles,
       classifiers=['Intended Audience :: Science/Research',
