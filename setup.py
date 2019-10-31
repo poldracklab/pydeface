@@ -5,6 +5,11 @@ from setuptools import setup
 
 VERSION = '2.0.0'
 
+# read the contents of README.md
+this_directory = os.path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    LONG_DESCRIPTION = f.read()
+
 if os.path.exists('MANIFEST'):
     os.remove('MANIFEST')
 
@@ -15,6 +20,8 @@ setup(name='pydeface',
       maintainer='Russ Poldrack',
       maintainer_email='poldrack@stanford.edu',
       description='A script to remove facial structure from MRI images.',
+      long_description=LONG_DESCRIPTION,
+      long_description_content_type='text/markdown',
       license='MIT',
       version=VERSION,
       url='http://poldracklab.org',
