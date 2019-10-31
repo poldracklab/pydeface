@@ -14,14 +14,18 @@ A tool to remove facial structure from MRI images.
 | [NiBabel](http://nipy.org/nibabel/)              | 2.5.1          |
 | [Nipype](http://nipype.readthedocs.io/en/latest/)| 1.3.0-rc1      |
 
-## To install:
+## Installation
+```
+pip install pydeface
+```
+or
 ```
 git clone https://github.com/poldracklab/pydeface.git
 cd pydeface
 python setup.py install
 ```
 
-## To use:
+## How to use
 ```
 pydeface infile.nii.gz
 ```
