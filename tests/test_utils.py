@@ -43,7 +43,7 @@ def test_deface_image():
         # # From https://stackoverflow.com/a/7244263
         # data_url = 'https://openneuro.org/crn/datasets/ds000031/files/sub-01:ses-006:anat:sub-01_ses-006_run-001_T1w.nii.gz'
         # urllib.request.urlretrieve(data_url, test_img)
-        pdu.deface_image(test_img,forcecleanup=True,force=True)
+        pdu.deface_image(test_img, forcecleanup=True, force=True)
         pdu.cleanup_files(test_img)
 
     else:
