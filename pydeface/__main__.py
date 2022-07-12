@@ -99,12 +99,14 @@ def main():
         print("Defacing mask also applied to:")
         for applyfile in args.applyto:
             applyfile_img = load(applyfile)
+            applyfile_data = np.asarray(applyfile_img.dataobj)
+            warped_mask_data = np.asarray(warped_mask_img.dataobj)
             try:
-                outdata = applyfile_img.get_data() * warped_mask_img.get_data()
+                outdata = applyfile_data * warped_mask_data
             except ValueError:
-                tmpdata = np.stack([warped_mask_img.get_data()] *
-                           applyfile_img.get_data().shape[-1], axis=-1)
-                outdata = applyfile_img.get_data() * tmpdata
+                tmpdata = np.stack(warped_mask_data * applyfile_data.shape[-1],
+                                   axis=-1)
+                outdata = applyfile_data * tmpdata
             applyfile_img = Nifti1Image(outdata, applyfile_img.affine,
                                         applyfile_img.header)
             outfile = pdu.output_checks(applyfile, force=args.force)

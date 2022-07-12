@@ -113,13 +113,14 @@ def deface_image(infile=None, outfile=None, facemask=None,
 
     # multiply mask by infile and save
     infile_img = load(infile)
+    infile_data = np.asarray(infile_img.dataobj)
     warped_mask_img = load(warped_mask)
+    warped_mask_data = np.asarray(warped_mask_img.dataobj)
     try:
-        outdata = infile_img.get_data().squeeze() * warped_mask_img.get_data()
+        outdata = infile_data.squeeze() * warped_mask_data
     except ValueError:
-        tmpdata = np.stack([warped_mask_img.get_data()] *
-                           infile_img.get_data().shape[-1], axis=-1)
-        outdata = infile_img.get_data() * tmpdata
+        tmpdata = np.stack(warped_mask_data * infile_img.shape[-1], axis=-1)
+        outdata = infile_data * tmpdata
 
     masked_brain = Nifti1Image(outdata, infile_img.affine, infile_img.header)
     masked_brain.to_filename(outfile)
