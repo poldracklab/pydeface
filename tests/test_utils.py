@@ -4,7 +4,6 @@ import tempfile
 import os
 import pytest
 from pathlib import Path
-# import urllib.request
 
 
 def test_cleanup_files():
@@ -33,18 +32,21 @@ def test_get_outfile_type():
 
 def test_deface_image():
     if which('fsl'):
-        test_img = (
-            Path(__file__).
-            parent.parent.
-            joinpath(
-                'tests',
-                'data',
-                'ds000031_sub-01_ses-006_run-001_T1w.nii.gz').as_posix())
-        # # From https://stackoverflow.com/a/7244263
-        # data_url = 'https://openneuro.org/crn/datasets/ds000031/files/sub-01:ses-006:anat:sub-01_ses-006_run-001_T1w.nii.gz'
-        # urllib.request.urlretrieve(data_url, test_img)
-        pdu.deface_image(test_img, forcecleanup=True, force=True)
-        pdu.cleanup_files(test_img)
+        # Piece together test data path
+        test_img_name = 'ds000031_sub-01_ses-006_run-001_T1w'
+        pydeface_path = Path(__file__).parent.parent
+        test_img_path = os.path.join(
+            pydeface_path, 'tests', 'data',
+            "{}.nii.gz".format(test_img_name))
+
+        # Run pydeface
+        pdu.deface_image(test_img_path, forcecleanup=True, force=True)
+
+        # Cleanup output nifti to not mistakenly push to repo
+        test_img_outpath = os.path.join(
+        pydeface_path, 'tests', 'data',
+        "{}_defaced.nii.gz".format(test_img_name))
+        pdu.cleanup_files(test_img_outpath)
 
     else:
-        pytest.skip("no fsl to run defacing.")
+        pytest.skip("No FSL to run defacing.")
