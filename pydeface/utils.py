@@ -121,8 +121,7 @@ def deface_image(infile=None, outfile=None, facemask=None,
                            infile_img.get_data().shape[-1], axis=-1)
         outdata = infile_img.get_data() * tmpdata
 
-    masked_brain = Nifti1Image(outdata, infile_img.get_affine(),
-                               infile_img.get_header())
+    masked_brain = Nifti1Image(outdata, infile_img.affine, infile_img.header)
     masked_brain.to_filename(outfile)
     print("Defaced image saved as:\n  %s" % outfile)
 
