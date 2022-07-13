@@ -50,7 +50,12 @@ setup(name='pydeface',
                    'Operating System :: POSIX',
                    'Operating System :: Unix',
                    'Operating System :: MacOS'],
-      install_requires=['numpy', 'nibabel', 'nipype'],
+      install_requires=[
+          'numpy',
+          'nibabel',
+          'nipype',
+          'setuptools',  # needed at runtime (for the pkg_resources module)
+      ],
       entry_points={
             'console_scripts': [
                 'pydeface = pydeface.__main__:main'
