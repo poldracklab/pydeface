@@ -18,7 +18,7 @@ twine upload dist/*
 import os
 from setuptools import setup
 
-VERSION = '2.0.1'
+VERSION = '2.0.2'
 
 # read the contents of README.md
 this_directory = os.path.abspath(os.path.dirname(__file__))
