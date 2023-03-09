@@ -8,6 +8,7 @@ import pydeface.utils as pdu
 import sys
 import shutil
 import numpy as np
+import os
 
 
 def is_interactive():
@@ -47,6 +48,11 @@ def main():
     parser.add_argument(
         "--outfile", metavar='path', required=False,
         help="If not provided adds '_defaced' suffix.")
+
+    parser.add_argument(
+        "--outdir", metavar='path', required=False,
+        help="Export all defaced images to this directory with '_defaced'"
+             "suffix. Overwrites '--outfile' argument.")
 
     parser.add_argument(
         "--force", action='store_true',
@@ -91,12 +97,18 @@ def main():
     if args.debug:
         setup_exceptionhook()
 
+    if args.outdir is not None:  # outdir overwrites outfile argument when used
+        print(f"Output directory: {args.outdir}")
+        basename, ext = os.path.basename(args.infile).split(os.extsep, 1)
+        args.outfile = os.path.join(args.outdir, f"{basename}_defaced.{ext}")
+
     warped_mask_img, warped_mask, template_reg, template_reg_mat =\
         pdu.deface_image(**vars(args))
 
     # apply mask to other given images
     if args.applyto is not None:
         print("Defacing mask also applied to:")
+
         for applyfile in args.applyto:
             applyfile_img = load(applyfile)
             applyfile_data = np.asarray(applyfile_img.dataobj)
@@ -109,7 +121,11 @@ def main():
                 outdata = applyfile_data * tmpdata
             applyfile_img = Nifti1Image(outdata, applyfile_img.affine,
                                         applyfile_img.header)
-            outfile = pdu.output_checks(applyfile, force=args.force)
+
+            if args.outdir is not None:
+                outfile = os.path.join(args.outdir, os.path.basename(applyfile))
+
+            outfile = pdu.output_checks(outfile, force=args.force)
             applyfile_img.to_filename(outfile)
             print('  %s' % applyfile)
 
