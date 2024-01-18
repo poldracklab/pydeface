@@ -80,8 +80,8 @@ def deface_image(infile=None, outfile=None, facemask=None,
                  forcecleanup=False, verbose=True, **kwargs):
     if not infile:
         raise ValueError("infile must be specified")
-    if shutil.which('fsl') is None:
-        raise EnvironmentError("fsl cannot be found on the path")
+    if shutil.which('flirt') is None:
+        raise EnvironmentError("FSL flirt cannot be found on the path")
 
     template, facemask = initial_checks(template, facemask)
     outfile = output_checks(infile, outfile, force)
