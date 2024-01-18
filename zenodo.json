@@ -1,0 +1,42 @@
+{
+  "creators": [
+    {
+      "affiliation": "Brain Innovation, NL; Maastricht University, NL",
+      "name": "Gulban, Omer Faruk",
+      "orcid": "0000-0001-7761-3727"
+    },
+    {
+      "affiliation": "Stanford University",
+      "name": "Nielson, Dylan",
+      "orcid": "0000-0003-4613-6643"
+    },
+    {
+      "affiliation": "Quansight",
+      "name": "Lee, John",
+      "orcid": "0000-0001-6398-6370"
+    },
+    {
+      "affiliation": "Stanford University, USA",
+      "name": "Poldrack, Russ",
+      "orcid": "0000-0001-6755-0259"
+    },
+    {
+      "affiliation": "Google LLC",
+      "name": "Gorgolewski, Chris",
+      "orcid": "0000-0003-3321-7583"
+    },
+    {
+      "name": "Vanessasaurus",
+    },
+    {
+      "affiliation": "Stanford University, USA",
+      "name": "Markiewicz, Chris",
+      "orcid": "0000-0002-6533-164X"
+    },
+  ],
+  "keywords": [
+    "neuroimaging"
+  ],
+  "license": "mit-license",
+  "upload_type": "software"
+}
