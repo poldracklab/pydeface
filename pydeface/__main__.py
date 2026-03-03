@@ -3,7 +3,7 @@
 
 import argparse
 from nibabel import load, Nifti1Image
-from pkg_resources import require
+from importlib.metadata import version, PackageNotFoundError
 import pydeface.utils as pdu
 import sys
 import shutil
@@ -83,7 +83,12 @@ def main():
                         help='Do not catch exceptions and show exception '
                         'traceback (Drop into pdb debugger).')
 
-    welcome_str = 'pydeface ' + require("pydeface")[0].version
+    pkg_name = __spec__.parent
+    try:
+        pkg_version = version(pkg_name)
+    except PackageNotFoundError:
+        pkg_version = 'unknown'
+    welcome_str = f'{pkg_name} {pkg_version}'
     welcome_decor = '-' * len(welcome_str)
     print(welcome_decor + '\n' + welcome_str + '\n' + welcome_decor)
 

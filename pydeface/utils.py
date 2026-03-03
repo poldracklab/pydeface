@@ -3,7 +3,7 @@
 import os
 import shutil
 import sys
-from pkg_resources import resource_filename, Requirement
+from importlib.resources import files
 import tempfile
 import numpy as np
 from nipype.interfaces import fsl
@@ -13,11 +13,9 @@ from nibabel import load, Nifti1Image
 def initial_checks(template=None, facemask=None):
     """Initial sanity checks."""
     if template is None:
-        template = resource_filename(Requirement.parse("pydeface"),
-                                     "pydeface/data/mean_reg2mean.nii.gz")
+        template = files("pydeface").joinpath("data/mean_reg2mean.nii.gz")
     if facemask is None:
-        facemask = resource_filename(Requirement.parse("pydeface"),
-                                     "pydeface/data/facemask.nii.gz")
+        facemask = files("pydeface").joinpath("data/facemask.nii.gz")
 
     if not os.path.exists(template):
         raise Exception('Missing template: %s' % template)
