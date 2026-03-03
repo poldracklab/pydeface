@@ -4,7 +4,7 @@ If you want to contribute to pydeface and make it better, your help is very welc
 
 ## Opening an issue
 
-- Please post your quesions, bug reports and feature requests [here](https://github.com/poldracklab/pydeface/issues).
+- Please post your questions, bug reports and feature requests [here](https://github.com/poldracklab/pydeface/issues).
 - When reporting a bug, please specify your system and a complete copy of the error message that you are getting.
 
 ## Making a pull request
