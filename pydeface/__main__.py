@@ -7,6 +7,7 @@ from importlib.metadata import version, PackageNotFoundError
 import pydeface.utils as pdu
 import sys
 import shutil
+import warnings
 import numpy as np
 
 
@@ -31,7 +32,7 @@ def setup_exceptionhook():
             # print()
             pdb.post_mortem(tb)
         else:
-            lgr.warn(
+            warnings.warn(
                 "We cannot setup exception hook since not in interactive mode")
 
     sys.excepthook = _pdb_excepthook
