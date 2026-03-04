@@ -10,7 +10,7 @@ jobs:
           command: |
             docker build -t poldracklab/pydeface:$CIRCLE_BUILD_NUM-${CIRCLE_SHA1:0:6} -f Dockerfile .
             docker run -it poldracklab/pydeface:$CIRCLE_BUILD_NUM-${CIRCLE_SHA1:0:6} pytest /pydeface
-             
+
   deploy:
     machine: true
     steps:
