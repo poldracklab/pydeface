@@ -1,0 +1,40 @@
+[build-system]
+requires = ["flit_core >= 3.12.0"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "pydeface"
+version = "2.0.2"
+maintainers = [
+    { name="Russ Poldrack", email="poldrack@stanford.edu"}
+]
+description = "A script to remove facial structure from MRI images"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3.7",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Operating System :: MacOS"
+]
+license = "MIT"
+license-files = ["LICENSE.txt"]
+dependencies = [
+    "numpy",
+    "nibabel",
+    "nipype",
+]
+
+[project.scripts]
+pydeface = "pydeface.__main__:main"
+
+[project.urls]
+homepage = "https://www.poldracklab.org/"
+source = "https://github.com/poldracklab/pydeface"
+
+[tool.flit.sdist]
+include = [
+    "Dockerfile",
+    "tests/"
+]
