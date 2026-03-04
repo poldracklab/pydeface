@@ -1,9 +1,11 @@
-import pydeface.utils as pdu
-from shutil import which
-import tempfile
 import os
-import pytest
+import tempfile
 from pathlib import Path
+from shutil import which
+
+import pytest
+
+import pydeface.utils as pdu
 
 
 def test_cleanup_files():

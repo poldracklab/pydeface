@@ -2,13 +2,15 @@
 """Defacing utility for MRI images."""
 
 import argparse
-from nibabel import load, Nifti1Image
-from importlib.metadata import version, PackageNotFoundError
-import pydeface.utils as pdu
-import sys
 import shutil
+import sys
 import warnings
+from importlib.metadata import PackageNotFoundError, version
+
 import numpy as np
+from nibabel import Nifti1Image, load
+
+import pydeface.utils as pdu
 
 
 def is_interactive():
@@ -26,8 +28,8 @@ def setup_exceptionhook():
     """
     def _pdb_excepthook(type, value, tb):
         if is_interactive():
-            import traceback
             import pdb
+            import traceback
             traceback.print_exception(type, value, tb)
             # print()
             pdb.post_mortem(tb)

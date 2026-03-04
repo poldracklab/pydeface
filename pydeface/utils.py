@@ -3,11 +3,12 @@
 import os
 import shutil
 import sys
-from importlib.resources import files
 import tempfile
+from importlib.resources import files
+
 import numpy as np
+from nibabel import Nifti1Image, load
 from nipype.interfaces import fsl
-from nibabel import load, Nifti1Image
 
 
 def initial_checks(template=None, facemask=None):
