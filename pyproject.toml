@@ -33,8 +33,19 @@ pydeface = "pydeface.__main__:main"
 homepage = "https://www.poldracklab.org/"
 source = "https://github.com/poldracklab/pydeface"
 
+[dependency-groups]
+test = [
+    "pytest",
+]
+
 [tool.flit.sdist]
 include = [
     "Dockerfile",
     "tests/"
+]
+
+[tool.pixi.workspace]
+channels = [
+    "https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/",
+    "conda-forge",
 ]
