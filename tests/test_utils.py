@@ -9,9 +9,7 @@ import pydeface.utils as pdu
 
 
 def test_cleanup_files():
-    files = []
-    for p in range(3):
-        files.append(tempfile.mkstemp()[1])
+    files = [tempfile.mkstemp()[1] for p in range(3)]
     pdu.cleanup_files(files[0])
     pdu.cleanup_files(*files[1:])
     # should not fail if files do not exist
