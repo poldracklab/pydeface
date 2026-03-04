@@ -24,7 +24,6 @@ dependencies = [
     "numpy",
     "nibabel",
     "nipype",
-    "setuptools"  # needed at runtime (for the pkg_resources module)
 ]
 
 [project.scripts]
