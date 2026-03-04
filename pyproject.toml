@@ -21,9 +21,14 @@ classifiers = [
 license = "MIT"
 license-files = ["LICENSE.txt"]
 dependencies = [
-    "numpy",
-    "nibabel",
-    "nipype",
+    "numpy>=2.0",
+    "nibabel>=5.3",
+    "nipype>=1.9",
+]
+
+[dependency-groups]
+test = [
+    "pytest>=9.0.2",
 ]
 
 [project.scripts]
