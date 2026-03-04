@@ -36,17 +36,17 @@ def test_deface_image():
         test_img_name = 'ds000031_sub-01_ses-006_run-001_T1w'
         pydeface_path = Path(__file__).parent.parent
         test_img_path = os.path.join(
-            pydeface_path, 'tests', 'data',
-            f"{test_img_name}.nii.gz")
+            pydeface_path, 'tests', 'data', f'{test_img_name}.nii.gz'
+        )
 
         # Run pydeface
         pdu.deface_image(test_img_path, forcecleanup=True, force=True)
 
         # Cleanup output nifti to not mistakenly push to repo
         test_img_outpath = os.path.join(
-        pydeface_path, 'tests', 'data',
-        f"{test_img_name}_defaced.nii.gz")
+            pydeface_path, 'tests', 'data', f'{test_img_name}_defaced.nii.gz'
+        )
         pdu.cleanup_files(test_img_outpath)
 
     else:
-        pytest.skip("No FSL to run defacing.")
+        pytest.skip('No FSL to run defacing.')

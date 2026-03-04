@@ -14,9 +14,9 @@ from nipype.interfaces import fsl
 def initial_checks(template=None, facemask=None):
     """Initial sanity checks."""
     if template is None:
-        template = files("pydeface").joinpath("data/mean_reg2mean.nii.gz")
+        template = files('pydeface').joinpath('data/mean_reg2mean.nii.gz')
     if facemask is None:
-        facemask = files("pydeface").joinpath("data/facemask.nii.gz")
+        facemask = files('pydeface').joinpath('data/facemask.nii.gz')
 
     if not os.path.exists(template):
         raise Exception(f'Missing template: {template}')
@@ -24,8 +24,9 @@ def initial_checks(template=None, facemask=None):
         raise Exception(f'Missing face mask: {facemask}')
 
     if 'FSLDIR' not in os.environ:
-        raise Exception("FSL must be installed and "
-                        "FSLDIR environment variable must be defined.")
+        raise Exception(
+            'FSL must be installed and FSLDIR environment variable must be defined.'
+        )
         sys.exit(2)
     return template, facemask
 
@@ -40,8 +41,10 @@ def output_checks(infile, outfile=None, force=False):
     if os.path.exists(outfile) and force:
         print('Previous output will be overwritten.')
     elif os.path.exists(outfile):
-        raise Exception(f"{outfile} already exists. Remove it first or use '--force' "
-                        "flag to overwrite.")
+        raise Exception(
+            f"{outfile} already exists. Remove it first or use '--force' "
+            'flag to overwrite.'
+        )
     else:
         pass
     return outfile
@@ -51,14 +54,14 @@ def generate_tmpfiles(verbose=True):
     _, template_reg_mat = tempfile.mkstemp(suffix='.mat')
     _, warped_mask = tempfile.mkstemp(suffix='.nii.gz')
     if verbose:
-        print(f"Temporary files:\n  {template_reg_mat}\n  {warped_mask}")
+        print(f'Temporary files:\n  {template_reg_mat}\n  {warped_mask}')
     _, template_reg = tempfile.mkstemp(suffix='.nii.gz')
     _, warped_mask_mat = tempfile.mkstemp(suffix='.mat')
     return template_reg, template_reg_mat, warped_mask, warped_mask_mat
 
 
 def cleanup_files(*args):
-    print("Cleaning up...")
+    print('Cleaning up...')
     for p in args:
         if os.path.exists(p):
             os.remove(p)
@@ -74,13 +77,21 @@ def get_outfile_type(outpath):
         raise ValueError('outfile path should be have .nii or .nii.gz suffix')
 
 
-def deface_image(infile=None, outfile=None, facemask=None,
-                 template=None, cost='mutualinfo', force=False,
-                 forcecleanup=False, verbose=True, **kwargs):
+def deface_image(
+    infile=None,
+    outfile=None,
+    facemask=None,
+    template=None,
+    cost='mutualinfo',
+    force=False,
+    forcecleanup=False,
+    verbose=True,
+    **kwargs,
+):
     if not infile:
-        raise ValueError("infile must be specified")
+        raise ValueError('infile must be specified')
     if shutil.which('fsl') is None:
-        raise OSError("fsl cannot be found on the path")
+        raise OSError('fsl cannot be found on the path')
 
     template, facemask = initial_checks(template, facemask)
     outfile = output_checks(infile, outfile, force)
@@ -123,7 +134,7 @@ def deface_image(infile=None, outfile=None, facemask=None,
 
     masked_brain = Nifti1Image(outdata, infile_img.affine, infile_img.header)
     masked_brain.to_filename(outfile)
-    print(f"Defaced image saved as:\n  {outfile}")
+    print(f'Defaced image saved as:\n  {outfile}')
 
     if forcecleanup:
         cleanup_files(warped_mask, template_reg, template_reg_mat)
