@@ -39,7 +39,7 @@ setup(name='pydeface',
       long_description_content_type='text/markdown',
       license='MIT',
       version=VERSION,
-      url='http://poldracklab.org',
+      url='https://www.poldracklab.org',
       download_url=('https://github.com/poldracklab/pydeface/archive/'
                     + VERSION + '.tar.gz'),
       packages=['pydeface'],
