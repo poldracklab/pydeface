@@ -37,7 +37,7 @@ def test_deface_image():
         pydeface_path = Path(__file__).parent.parent
         test_img_path = os.path.join(
             pydeface_path, 'tests', 'data',
-            "{}.nii.gz".format(test_img_name))
+            f"{test_img_name}.nii.gz")
 
         # Run pydeface
         pdu.deface_image(test_img_path, forcecleanup=True, force=True)
@@ -45,7 +45,7 @@ def test_deface_image():
         # Cleanup output nifti to not mistakenly push to repo
         test_img_outpath = os.path.join(
         pydeface_path, 'tests', 'data',
-        "{}_defaced.nii.gz".format(test_img_name))
+        f"{test_img_name}_defaced.nii.gz")
         pdu.cleanup_files(test_img_outpath)
 
     else:

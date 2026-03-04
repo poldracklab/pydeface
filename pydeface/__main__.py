@@ -119,7 +119,7 @@ def main():
                                         applyfile_img.header)
             outfile = pdu.output_checks(applyfile, force=args.force)
             applyfile_img.to_filename(outfile)
-            print('  {}'.format(applyfile))
+            print(f'  {applyfile}')
 
     if not args.nocleanup:
         pdu.cleanup_files(warped_mask, template_reg, template_reg_mat)

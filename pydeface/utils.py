@@ -19,9 +19,9 @@ def initial_checks(template=None, facemask=None):
         facemask = files("pydeface").joinpath("data/facemask.nii.gz")
 
     if not os.path.exists(template):
-        raise Exception('Missing template: {}'.format(template))
+        raise Exception(f'Missing template: {template}')
     if not os.path.exists(facemask):
-        raise Exception('Missing face mask: {}'.format(facemask))
+        raise Exception(f'Missing face mask: {facemask}')
 
     if 'FSLDIR' not in os.environ:
         raise Exception("FSL must be installed and "
@@ -40,8 +40,8 @@ def output_checks(infile, outfile=None, force=False):
     if os.path.exists(outfile) and force:
         print('Previous output will be overwritten.')
     elif os.path.exists(outfile):
-        raise Exception("{} already exists. Remove it first or use '--force' "
-                        "flag to overwrite.".format(outfile))
+        raise Exception(f"{outfile} already exists. Remove it first or use '--force' "
+                        "flag to overwrite.")
     else:
         pass
     return outfile
@@ -51,7 +51,7 @@ def generate_tmpfiles(verbose=True):
     _, template_reg_mat = tempfile.mkstemp(suffix='.mat')
     _, warped_mask = tempfile.mkstemp(suffix='.nii.gz')
     if verbose:
-        print("Temporary files:\n  {}\n  {}".format(template_reg_mat, warped_mask))
+        print(f"Temporary files:\n  {template_reg_mat}\n  {warped_mask}")
     _, template_reg = tempfile.mkstemp(suffix='.nii.gz')
     _, warped_mask_mat = tempfile.mkstemp(suffix='.mat')
     return template_reg, template_reg_mat, warped_mask, warped_mask_mat
@@ -86,7 +86,7 @@ def deface_image(infile=None, outfile=None, facemask=None,
     outfile = output_checks(infile, outfile, force)
     template_reg, template_reg_mat, warped_mask, warped_mask_mat = generate_tmpfiles()
 
-    print('Defacing...\n  {}'.format(infile))
+    print(f'Defacing...\n  {infile}')
     # register template to infile
     outfile_type = get_outfile_type(template_reg)
     flirt = fsl.FLIRT()
@@ -123,7 +123,7 @@ def deface_image(infile=None, outfile=None, facemask=None,
 
     masked_brain = Nifti1Image(outdata, infile_img.affine, infile_img.header)
     masked_brain.to_filename(outfile)
-    print("Defaced image saved as:\n  {}".format(outfile))
+    print(f"Defaced image saved as:\n  {outfile}")
 
     if forcecleanup:
         cleanup_files(warped_mask, template_reg, template_reg_mat)
