@@ -66,8 +66,7 @@ def main():
         nargs='+',
         required=False,
         metavar='',
-        help='Apply the created face mask to other images. Can take multiple '
-        'arguments.',
+        help='Apply the created face mask to other images. Can take multiple arguments.',
     )
 
     parser.add_argument(
@@ -83,8 +82,7 @@ def main():
         metavar='path',
         required=False,
         help=(
-            'Optional template image that will be used as the registration '
-            'target instead of the default.'
+            'Optional template image that will be used as the registration target instead of the default.'
         ),
     )
 
@@ -111,8 +109,7 @@ def main():
         '--debug',
         action='store_true',
         dest='debug',
-        help='Do not catch exceptions and show exception '
-        'traceback (Drop into pdb debugger).',
+        help='Do not catch exceptions and show exception traceback (Drop into pdb debugger).',
     )
 
     pkg_name = __spec__.parent
