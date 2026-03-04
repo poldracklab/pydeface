@@ -34,7 +34,7 @@ ENTRYPOINT ["/neurodocker/startup.sh"]
 
 #-----------------------------------------------------------
 # Install FSL v5.0.10
-# FSL is non-free. If you are considering commerical use
+# FSL is non-free. If you are considering commercial use
 # of this Docker image, please consult the relevant license:
 # https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence
 #-----------------------------------------------------------
