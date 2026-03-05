@@ -12,7 +12,7 @@ jobs:
             docker run -t poldracklab/pydeface:test
             docker build -t poldracklab/pydeface:$CIRCLE_BUILD_NUM-${CIRCLE_SHA1:0:6} -f Dockerfile .
             docker run -t poldracklab/pydeface:$CIRCLE_BUILD_NUM-${CIRCLE_SHA1:0:6} --help
-             
+
   deploy:
     machine: true
     steps:
@@ -41,4 +41,3 @@ workflows:
           filters:
             branches:
               only: master
-
