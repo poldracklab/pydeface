@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.19
 FROM ghcr.io/prefix-dev/pixi:0.65.0 AS build
 
 RUN mkdir /app
