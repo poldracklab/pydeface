@@ -21,9 +21,14 @@ classifiers = [
 license = "MIT"
 license-files = ["LICENSE.txt"]
 dependencies = [
-    "numpy",
-    "nibabel",
-    "nipype",
+    "numpy>=2.0",
+    "nibabel>=5.3",
+    "nipype>=1.9",
+]
+
+[dependency-groups]
+test = [
+    "pytest>=9.0.2",
 ]
 
 [project.scripts]
@@ -38,3 +43,26 @@ include = [
     "Dockerfile",
     "tests/"
 ]
+
+# Define pixi environment to manage FSL dependencies
+# Use `pixi install` to create a production environment
+# Use `pixi shell -e dev` to work in a development environment
+[tool.pixi.workspace]
+channels = ["https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public", "conda-forge"]
+platforms = ["linux-64"]
+
+[tool.pixi.activation.env]
+FSLDIR = "$CONDA_PREFIX"
+FSLOUTPUTTYPE = "NIFTI_GZ"
+
+[tool.pixi.environments]
+default = { features = ["production"], solve-group = "default" }
+dev = { features = ["editable", "test"], solve-group = "dev" }
+
+[tool.pixi.feature.editable.pypi-dependencies]
+pydeface = { path = ".", editable = true }
+[tool.pixi.feature.production.pypi-dependencies]
+pydeface = { path = ".", editable = false }
+
+[tool.pixi.dependencies]
+fsl-flirt = "2111.4.*"

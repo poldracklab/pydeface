@@ -5,11 +5,13 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Docker Bulid and Test
+          name: Docker Build and Test
           no_output_timeout: 20m
           command: |
+            docker build -t poldracklab/pydeface:test -f Dockerfile . --target test
+            docker run -t poldracklab/pydeface:test
             docker build -t poldracklab/pydeface:$CIRCLE_BUILD_NUM-${CIRCLE_SHA1:0:6} -f Dockerfile .
-            docker run -it poldracklab/pydeface:$CIRCLE_BUILD_NUM-${CIRCLE_SHA1:0:6} pytest /pydeface
+            docker run -t poldracklab/pydeface:$CIRCLE_BUILD_NUM-${CIRCLE_SHA1:0:6} --help
              
   deploy:
     machine: true
@@ -20,8 +22,10 @@ jobs:
           no_output_timeout: 20m
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker build -t poldracklab/pydeface:test -f Dockerfile . --target test
+            docker run -t poldracklab/pydeface:test
             docker build -t poldracklab/pydeface:$CIRCLE_BUILD_NUM-${CIRCLE_SHA1:0:6} -f Dockerfile .
-            docker run -it poldracklab/pydeface:$CIRCLE_BUILD_NUM-${CIRCLE_SHA1:0:6} pytest /pydeface
+            docker run -t poldracklab/pydeface:$CIRCLE_BUILD_NUM-${CIRCLE_SHA1:0:6} --help
             docker tag poldracklab/pydeface:$CIRCLE_BUILD_NUM-${CIRCLE_SHA1:0:6} poldracklab/pydeface:latest
             docker push poldracklab/pydeface
 
