@@ -22,7 +22,7 @@ or
 ```
 git clone https://github.com/poldracklab/pydeface.git
 cd pydeface
-python setup.py install
+pip install .
 ```
 
 ## How to use
