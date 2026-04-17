@@ -90,7 +90,7 @@ def main():
     parser.add_argument(
         '--legacy',
         action='store_true',
-        help='Use the legacy non-MNI-aligned templates (default is to use MNI aligned templates)'
+        help='Use the legacy non-MNI-aligned templates (default is to use MNI aligned templates)',
     )
 
     parser.add_argument(
@@ -135,7 +135,9 @@ def main():
     # set templates to legacy if option used
     if args.legacy:
         if args.template is None:
-            args.template = files('pydeface').joinpath('data/mean_reg2mean_legacy.nii.gz')
+            args.template = files('pydeface').joinpath(
+                'data/mean_reg2mean_legacy.nii.gz'
+            )
         if args.facemask is None:
             args.facemask = files('pydeface').joinpath('data/facemask_legacy.nii.gz')
 
