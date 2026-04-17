@@ -6,6 +6,7 @@ import shutil
 import sys
 import warnings
 from importlib.metadata import PackageNotFoundError, version
+from importlib.resources import files
 
 import numpy as np
 from nibabel import Nifti1Image, load
@@ -87,6 +88,12 @@ def main():
     )
 
     parser.add_argument(
+        '--legacy',
+        action='store_true',
+        help='Use the legacy non-MNI-aligned templates (default is to use MNI aligned templates)'
+    )
+
+    parser.add_argument(
         '--facemask',
         metavar='path',
         required=False,
@@ -124,6 +131,13 @@ def main():
     args = parser.parse_args()
     if args.debug:
         setup_exceptionhook()
+
+    # set templates to legacy if option used
+    if args.legacy:
+        if args.template is None:
+            args.template = files('pydeface').joinpath('data/mean_reg2mean_legacy.nii.gz')
+        if args.facemask is None:
+            args.facemask = files('pydeface').joinpath('data/facemask_legacy.nii.gz')
 
     warped_mask_img, warped_mask, template_reg, template_reg_mat = pdu.deface_image(
         **vars(args)
