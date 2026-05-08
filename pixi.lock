@@ -1230,8 +1230,8 @@ packages:
   requires_python: '>=3.12'
 - pypi: ./
   name: pydeface
-  version: 2.0.2
-  sha256: 2959fefd6cceebaf17ada517e8e7e82f4199f989ec3870dfef2771ce5305648d
+  version: 2.1.0
+  sha256: 7712462bd78faa4c88801e14ca878c253ee75793e035c6dda37ac4f4f4b124f5
   requires_dist:
   - numpy>=2.0
   - nibabel>=5.3
