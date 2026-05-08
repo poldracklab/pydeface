@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "pydeface"
-version = "2.1.0"
+version = "2.1.1-dev"
 maintainers = [
     { name="Russ Poldrack", email="poldrack@stanford.edu"}
 ]
