@@ -30,6 +30,28 @@ def test_get_outfile_type():
         pdu.get_outfile_type('path.suffix')
 
 
+def test_deface_image_requires_flirt(monkeypatch, tmp_path):
+    bin_dir = tmp_path / 'bin'
+    bin_dir.mkdir()
+    monkeypatch.setenv('PATH', str(bin_dir))
+
+    with pytest.raises(OSError, match='flirt'):
+        pdu.deface_image('input.nii.gz')
+
+
+def test_deface_image_accepts_flirt_without_fsl(monkeypatch, tmp_path):
+    bin_dir = tmp_path / 'bin'
+    bin_dir.mkdir()
+    flirt = bin_dir / 'flirt'
+    flirt.write_text('#!/bin/sh\nexit 0\n')
+    flirt.chmod(0o755)
+    monkeypatch.setenv('PATH', str(bin_dir))
+    monkeypatch.delenv('FSLDIR', raising=False)
+
+    with pytest.raises(Exception, match='FSLDIR'):
+        pdu.deface_image('input.nii.gz')
+
+
 def test_deface_image():
     if which('fsl'):
         # Piece together test data path
