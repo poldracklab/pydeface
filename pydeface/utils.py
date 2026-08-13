@@ -129,7 +129,7 @@ def deface_image(
     try:
         outdata = infile_data.squeeze() * warped_mask_data
     except ValueError:
-        tmpdata = np.stack(warped_mask_data * infile_img.shape[-1], axis=-1)
+        tmpdata = np.stack([warped_mask_data] * infile_img.shape[-1], axis=-1)
         outdata = infile_data * tmpdata
 
     masked_brain = Nifti1Image(outdata, infile_img.affine, infile_img.header)
