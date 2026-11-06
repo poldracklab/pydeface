@@ -23,6 +23,39 @@ def test_generate_tmpfiles():
         os.remove(f)
 
 
+def test_generate_tmpfiles_closes_descriptors():
+    fd_dir = Path('/proc/self/fd')
+    if not fd_dir.exists():
+        pytest.skip('needs /proc/self/fd')
+    before = len(os.listdir(fd_dir))
+    for _ in range(5):
+        pdu.cleanup_files(*pdu.generate_tmpfiles(verbose=False))
+    assert len(os.listdir(fd_dir)) == before
+
+
+def test_deface_image_leaves_no_matrix_file(monkeypatch, tmp_path):
+    import nibabel as nib
+    import numpy as np
+    from nipype.interfaces import fsl
+
+    def fake_run(self):
+        img = nib.Nifti1Image(np.ones((4, 4, 4), dtype='f4'), np.eye(4))
+        nib.save(img, self.inputs.out_file)
+
+    infile = tmp_path / 'in.nii.gz'
+    nib.save(nib.Nifti1Image(np.ones((4, 4, 4), dtype='f4'), np.eye(4)), infile)
+    tmp_dir = tmp_path / 'tmp'
+    tmp_dir.mkdir()
+    monkeypatch.setattr('tempfile.tempdir', str(tmp_dir))
+    monkeypatch.setattr(pdu.shutil, 'which', lambda name: '/fsl/bin/flirt')
+    monkeypatch.setenv('FSLDIR', '/fsl')
+    monkeypatch.setattr(fsl.FLIRT, 'run', fake_run)
+
+    pdu.deface_image(str(infile), force=True, forcecleanup=True, verbose=False)
+
+    assert list(tmp_dir.iterdir()) == []
+
+
 def test_get_outfile_type():
     assert pdu.get_outfile_type('path.nii.gz') == 'NIFTI_GZ'
     assert pdu.get_outfile_type('path.nii') == 'NIFTI'

@@ -51,12 +51,15 @@ def output_checks(infile, outfile=None, force=False):
 
 
 def generate_tmpfiles(verbose=True):
-    _, template_reg_mat = tempfile.mkstemp(suffix='.mat')
-    _, warped_mask = tempfile.mkstemp(suffix='.nii.gz')
+    paths = []
+    for suffix in ('.mat', '.nii.gz', '.nii.gz', '.mat'):
+        fd, path = tempfile.mkstemp(suffix=suffix)
+        # only the names are needed; FSL opens the files itself
+        os.close(fd)
+        paths.append(path)
+    template_reg_mat, warped_mask, template_reg, warped_mask_mat = paths
     if verbose:
         print(f'Temporary files:\n  {template_reg_mat}\n  {warped_mask}')
-    _, template_reg = tempfile.mkstemp(suffix='.nii.gz')
-    _, warped_mask_mat = tempfile.mkstemp(suffix='.mat')
     return template_reg, template_reg_mat, warped_mask, warped_mask_mat
 
 
@@ -120,6 +123,10 @@ def deface_image(
     flirt.inputs.output_type = outfile_type
     flirt.inputs.out_matrix_file = warped_mask_mat
     flirt.run()
+
+    # this matrix is not returned to the caller, so nobody else can remove it
+    if os.path.exists(warped_mask_mat):
+        os.remove(warped_mask_mat)
 
     # multiply mask by infile and save
     infile_img = load(infile)
