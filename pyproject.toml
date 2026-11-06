@@ -81,10 +81,6 @@ platforms = ["linux-64"]
 FSLDIR = "$CONDA_PREFIX"
 FSLOUTPUTTYPE = "NIFTI_GZ"
 
-[tool.pixi.dependencies]
-# Sync with requires-python
-python = ">=3.10"
-
 [tool.pixi.feature.fsl.dependencies]
 fsl-flirt = ">=2111.4"
 
@@ -118,7 +114,9 @@ python = "3.14.*"
 solve-strategy = "lowest-direct"
 # numpy and nibabel are installed from conda as FSL dependencies, so the
 # minimum versions must be repeated here for lowest-direct to apply to them.
-# Keep these in sync with project.dependencies.
 [tool.pixi.feature.min.dependencies]
+# Sync with requires-python
+python = "3.10.*"
+# sync with project.dependencies
 numpy = ">=2.0"
 nibabel = ">=5.3"
