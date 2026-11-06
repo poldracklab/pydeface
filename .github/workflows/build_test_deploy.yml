@@ -72,6 +72,10 @@ jobs:
 
       - name: Run tests
         run: uv run --group=test pytest --cov
+      - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+        if: ${{ always() }}
 
   publish:
     name: Publish released package to pypi.org
