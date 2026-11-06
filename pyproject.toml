@@ -70,7 +70,7 @@ ignore = [
     "B028", # No explicit stacklevel keyword argument found
 ]
 
-# Define pixi environment to manage FSL dependencies
+# Define pixi environments to install FLIRT along with Python
 # Use `pixi install` to create a production environment
 # Use `pixi shell -e dev` to work in a development environment
 [tool.pixi.workspace]
@@ -81,14 +81,44 @@ platforms = ["linux-64"]
 FSLDIR = "$CONDA_PREFIX"
 FSLOUTPUTTYPE = "NIFTI_GZ"
 
-[tool.pixi.environments]
-default = { features = ["production"], solve-group = "default" }
-dev = { features = ["editable", "test"], solve-group = "dev" }
+[tool.pixi.dependencies]
+# Sync with requires-python
+python = ">=3.10"
 
-[tool.pixi.feature.editable.pypi-dependencies]
+[tool.pixi.feature.fsl.dependencies]
+fsl-flirt = ">=2111.4"
+
+# Install pydeface editable except in production
+[tool.pixi.pypi-dependencies]
 pydeface = { path = ".", editable = true }
 [tool.pixi.feature.production.pypi-dependencies]
 pydeface = { path = ".", editable = false }
 
-[tool.pixi.dependencies]
-fsl-flirt = "2111.4.*"
+[tool.pixi.environments]
+default = ["production", "fsl"]
+dev = ["test", "fsl"]
+min = ["min", "test", "fsl"]
+# Test environments for Python minor release series between min and dev
+# Python tests only
+py311 = ["py311", "test"]
+py312 = ["py312", "test"]
+py313 = ["py313", "test"]
+py314 = ["py314", "test"]
+
+[tool.pixi.feature.py311.dependencies]
+python = "3.11.*"
+[tool.pixi.feature.py312.dependencies]
+python = "3.12.*"
+[tool.pixi.feature.py313.dependencies]
+python = "3.13.*"
+[tool.pixi.feature.py314.dependencies]
+python = "3.14.*"
+
+[tool.pixi.feature.min]
+solve-strategy = "lowest-direct"
+# numpy and nibabel are installed from conda as FSL dependencies, so the
+# minimum versions must be repeated here for lowest-direct to apply to them.
+# Keep these in sync with project.dependencies.
+[tool.pixi.feature.min.dependencies]
+numpy = ">=2.0"
+nibabel = ">=5.3"
