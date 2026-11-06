@@ -139,7 +139,9 @@ def main():
             try:
                 outdata = applyfile_data * warped_mask_data
             except ValueError:
-                tmpdata = np.stack(warped_mask_data * applyfile_data.shape[-1], axis=-1)
+                tmpdata = np.stack(
+                    [warped_mask_data] * applyfile_data.shape[-1], axis=-1
+                )
                 outdata = applyfile_data * tmpdata
             applyfile_img = Nifti1Image(
                 outdata, applyfile_img.affine, applyfile_img.header
