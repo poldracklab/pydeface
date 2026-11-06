@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1.19
-FROM ghcr.io/prefix-dev/pixi:0.65.0 AS build
+FROM ghcr.io/prefix-dev/pixi:0.84.1 AS build
 
 RUN mkdir /app
 COPY pixi.lock pyproject.toml /app
 WORKDIR /app
-RUN --mount=type=cache,target=/root/.cache/rattler pixi install --all --frozen --skip pydeface
+RUN --mount=type=cache,target=/root/.cache/rattler pixi install -e default -e dev --frozen --skip pydeface
 RUN pixi shell-hook -e default --as-is > /shell-hook.sh
 RUN pixi shell-hook -e dev --as-is > /shell-hook-dev.sh
 
