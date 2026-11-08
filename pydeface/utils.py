@@ -50,16 +50,6 @@ def output_checks(infile, outfile=None, force=False):
     return outfile
 
 
-def generate_tmpfiles(verbose=True):
-    _, template_reg_mat = tempfile.mkstemp(suffix='.mat')
-    _, warped_mask = tempfile.mkstemp(suffix='.nii.gz')
-    if verbose:
-        print(f'Temporary files:\n  {template_reg_mat}\n  {warped_mask}')
-    _, template_reg = tempfile.mkstemp(suffix='.nii.gz')
-    _, warped_mask_mat = tempfile.mkstemp(suffix='.mat')
-    return template_reg, template_reg_mat, warped_mask, warped_mask_mat
-
-
 def cleanup_files(*args):
     print('Cleaning up...')
     for p in args:
@@ -95,7 +85,13 @@ def deface_image(
 
     template, facemask = initial_checks(template, facemask)
     outfile = output_checks(infile, outfile, force)
-    template_reg, template_reg_mat, warped_mask, warped_mask_mat = generate_tmpfiles()
+    tmpdir = tempfile.mkdtemp(prefix='pydeface')
+    if verbose:
+        print(f'Temporary directory: {tmpdir}')
+    template_reg_mat = os.path.join(tmpdir, 'reg.mat')
+    template_reg = os.path.join(tmpdir, 'reg.nii.gz')
+    warped_mask = os.path.join(tmpdir, 'mask.nii.gz')
+    warped_mask_mat = os.path.join(tmpdir, 'mask.mat')
 
     print(f'Defacing...\n  {infile}')
     # register template to infile
@@ -137,7 +133,7 @@ def deface_image(
     print(f'Defaced image saved as:\n  {outfile}')
 
     if forcecleanup:
-        cleanup_files(warped_mask, template_reg, template_reg_mat)
+        shutil.rmtree(tmpdir)
         return warped_mask_img
     else:
         return warped_mask_img, warped_mask, template_reg, template_reg_mat

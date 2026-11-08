@@ -2,6 +2,7 @@
 """Defacing utility for MRI images."""
 
 import argparse
+import os
 import shutil
 import sys
 import warnings
@@ -125,9 +126,7 @@ def main():
     if args.debug:
         setup_exceptionhook()
 
-    warped_mask_img, warped_mask, template_reg, template_reg_mat = pdu.deface_image(
-        **vars(args)
-    )
+    warped_mask_img, warped_mask, _, template_reg_mat = pdu.deface_image(**vars(args))
 
     # apply mask to other given images
     if args.applyto is not None:
@@ -149,7 +148,7 @@ def main():
             print(f'  {applyfile}')
 
     if not args.nocleanup:
-        pdu.cleanup_files(warped_mask, template_reg, template_reg_mat)
+        shutil.rmtree(os.path.dirname(warped_mask))
     else:
         unclean_mask = args.infile.replace('.gz', '').replace(
             '.nii', '_pydeface_mask.nii.gz'

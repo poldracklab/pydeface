@@ -3,7 +3,10 @@ import tempfile
 from pathlib import Path
 from shutil import which
 
+import nibabel as nib
+import numpy as np
 import pytest
+from nipype.interfaces import fsl
 
 import pydeface.utils as pdu
 
@@ -16,11 +19,41 @@ def test_cleanup_files():
     pdu.cleanup_files(*files)
 
 
-def test_generate_tmpfiles():
-    files = pdu.generate_tmpfiles()
-    for f in files:
-        assert os.path.exists(f)
-        os.remove(f)
+def _stub_flirt(monkeypatch, tmp_path):
+    def fake_run(self):
+        img = nib.Nifti1Image(np.ones((4, 4, 4), dtype='f4'), np.eye(4))
+        nib.save(img, self.inputs.out_file)
+
+    infile = tmp_path / 'in.nii.gz'
+    nib.save(nib.Nifti1Image(np.ones((4, 4, 4), dtype='f4'), np.eye(4)), infile)
+    tmp_dir = tmp_path / 'tmp'
+    tmp_dir.mkdir()
+    monkeypatch.setattr('tempfile.tempdir', str(tmp_dir))
+    monkeypatch.setattr(pdu.shutil, 'which', lambda name: '/fsl/bin/flirt')
+    monkeypatch.setenv('FSLDIR', '/fsl')
+    monkeypatch.setattr(fsl.FLIRT, 'run', fake_run)
+    return infile, tmp_dir
+
+
+def test_deface_image_removes_temporary_directory(monkeypatch, tmp_path):
+    infile, tmp_dir = _stub_flirt(monkeypatch, tmp_path)
+
+    pdu.deface_image(str(infile), force=True, forcecleanup=True, verbose=False)
+
+    assert list(tmp_dir.iterdir()) == []
+
+
+def test_deface_image_keeps_temporary_files_in_one_directory(monkeypatch, tmp_path):
+    infile, tmp_dir = _stub_flirt(monkeypatch, tmp_path)
+
+    _, warped_mask, template_reg, template_reg_mat = pdu.deface_image(
+        str(infile), force=True, verbose=False
+    )
+
+    (workdir,) = tmp_dir.iterdir()
+    for path in (warped_mask, template_reg, template_reg_mat):
+        assert Path(path).parent == workdir
+    assert Path(warped_mask).exists()
 
 
 def test_get_outfile_type():
