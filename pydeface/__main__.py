@@ -136,11 +136,7 @@ def main():
             applyfile_img = load(applyfile)
             applyfile_data = np.asarray(applyfile_img.dataobj)
             warped_mask_data = np.asarray(warped_mask_img.dataobj)
-            try:
-                outdata = applyfile_data * warped_mask_data
-            except ValueError:
-                tmpdata = np.stack(warped_mask_data * applyfile_data.shape[-1], axis=-1)
-                outdata = applyfile_data * tmpdata
+            outdata = pdu.apply_mask(applyfile_data, warped_mask_data)
             applyfile_img = Nifti1Image(
                 outdata, applyfile_img.affine, applyfile_img.header
             )

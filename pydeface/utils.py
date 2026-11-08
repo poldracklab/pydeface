@@ -77,6 +77,16 @@ def get_outfile_type(outpath):
         raise ValueError('outfile path should be have .nii or .nii.gz suffix')
 
 
+def apply_mask(data, mask):
+    """Multiply image data by a 3D mask.
+
+    The mask is applied to every volume when the data has trailing
+    volume axes, as in a 4D functional image.
+    """
+    mask = mask.reshape(*mask.shape, *([1] * (data.ndim - mask.ndim)))
+    return data * mask
+
+
 def deface_image(
     infile=None,
     outfile=None,
@@ -126,11 +136,7 @@ def deface_image(
     infile_data = np.asarray(infile_img.dataobj)
     warped_mask_img = load(warped_mask)
     warped_mask_data = np.asarray(warped_mask_img.dataobj)
-    try:
-        outdata = infile_data.squeeze() * warped_mask_data
-    except ValueError:
-        tmpdata = np.stack(warped_mask_data * infile_img.shape[-1], axis=-1)
-        outdata = infile_data * tmpdata
+    outdata = apply_mask(infile_data, warped_mask_data)
 
     masked_brain = Nifti1Image(outdata, infile_img.affine, infile_img.header)
     masked_brain.to_filename(outfile)
